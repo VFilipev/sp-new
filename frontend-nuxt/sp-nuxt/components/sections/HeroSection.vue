@@ -7,6 +7,9 @@ import logo from "~/assets/resort/logo.png";
 
 // Компонент использует window API для parallax эффекта, поэтому рендерится только на клиенте
 
+
+
+
 // Компонент сам запрашивает свои данные через composable
 const { data: heroData, error: heroError } = useHero()
 
