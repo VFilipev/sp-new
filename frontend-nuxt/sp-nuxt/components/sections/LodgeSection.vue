@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
               :height="456"
               :quality="75"
               loading="lazy"
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="626px"
               class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
@@ -189,7 +189,7 @@ onBeforeUnmount(() => {
               :height="834"
               :quality="75"
               loading="lazy"
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="626px"
               class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />

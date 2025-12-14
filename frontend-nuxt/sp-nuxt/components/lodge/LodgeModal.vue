@@ -44,7 +44,7 @@ const handleClose = () => emit('close')
             :height="940"
             :quality="80"
             loading="eager"
-            sizes="100vw"
+            sizes="1410px"
             class="h-full w-full object-cover"
           />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />

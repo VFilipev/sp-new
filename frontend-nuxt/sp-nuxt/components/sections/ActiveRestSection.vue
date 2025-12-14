@@ -149,7 +149,7 @@ onMounted(() => {
               :height="541"
               :quality="75"
               loading="lazy"
-              sizes="(max-width: 768px) 100vw, 33vw"
+              sizes="406px"
               class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <video

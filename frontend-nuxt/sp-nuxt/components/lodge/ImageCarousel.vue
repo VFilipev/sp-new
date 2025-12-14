@@ -48,7 +48,7 @@ const handleMouseLeave = () => {
       :height="456"
       :quality="75"
       :loading="index === 0 ? 'eager' : 'lazy'"
-      sizes="(max-width: 768px) 100vw, 50vw"
+      sizes="626px"
       class="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
       :class="index === activeIndex ? 'opacity-100' : 'opacity-0'"
     />
