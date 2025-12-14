@@ -70,6 +70,18 @@ export default defineNuxtConfig({
     defaultLocale: 'ru',
   },
 
+  // Настройки robots.txt
+  robots: {
+    allow: ['/'],
+    disallow: ['/admin/', '/api/'],
+    // Формируем правильный URL sitemap, убирая возможные лишние символы
+    sitemap: (() => {
+      const siteUrl = (process.env.SITE_URL || 'http://localhost:3000').replace(/[§]/g, '');
+      // Убеждаемся, что URL заканчивается правильно
+      return siteUrl.replace(/\/$/, '') + '/api/sitemap.xml';
+    })(),
+  },
+
 
   // Настройки сборки
   nitro: {
