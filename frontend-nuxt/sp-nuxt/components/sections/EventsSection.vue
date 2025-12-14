@@ -88,9 +88,14 @@ onBeforeUnmount(() => {
           }"
         >
           <!-- Background Image -->
-          <img
+          <NuxtImg
             :src="event.image"
             :alt="event.title"
+            :width="300"
+            :height="450"
+            :quality="70"
+            :loading="index === 0 ? 'eager' : 'lazy'"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
 

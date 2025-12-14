@@ -10,8 +10,6 @@ import nac from "~/assets/resort/nac.webp";
 // Компонент использует window API для parallax эффекта, поэтому рендерится только на клиенте
 
 
-
-
 // Компонент сам запрашивает свои данные через composable
 const { data: heroData, error: heroError } = useHero()
 
@@ -92,6 +90,9 @@ onBeforeUnmount(() => {
     <NuxtImg
       :src="heroImageSrc"
       alt="Коттеджи базы отдыха Строгановские Просторы зимой"
+      :width="1410"
+      :height="940"
+      :quality="80"
       class="h-full w-full object-cover transition-transform duration-200 ease-out"
       :style="parallaxStyle"
       loading="eager"

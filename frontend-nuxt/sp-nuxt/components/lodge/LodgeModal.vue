@@ -37,7 +37,16 @@ const handleClose = () => emit('close')
         ]"
       >
         <div v-if="!showContent || isClosing" class="absolute inset-0">
-          <img :src="meta.heroImage" :alt="meta.title" class="h-full w-full object-cover" />
+          <NuxtImg
+            :src="meta.heroImage"
+            :alt="meta.title"
+            :width="1410"
+            :height="940"
+            :quality="80"
+            loading="eager"
+            sizes="100vw"
+            class="h-full w-full object-cover"
+          />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
           <div class="absolute inset-0 flex flex-col justify-end p-8">
             <h3 class="mb-3 text-3xl font-serif text-white md:text-4xl">

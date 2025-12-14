@@ -28,7 +28,16 @@ const activities = [
           :style="{ animationDelay: `${index * 150}ms` }"
         >
           <div class="relative h-[400px] overflow-hidden">
-            <img :src="activity.image" :alt="activity.title" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <NuxtImg
+              :src="activity.image"
+              :alt="activity.title"
+              :width="406"
+              :height="541"
+              :quality="75"
+              loading="lazy"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             <div class="absolute inset-0 flex flex-col justify-end p-6 text-white">
               <h3 class="mb-2 text-2xl font-semibold transition-transform duration-300 group-hover:-translate-y-1">

@@ -142,7 +142,16 @@ onMounted(() => {
           @mouseleave="handleMouseLeave(index)"
         >
           <div class="relative h-[400px] overflow-hidden">
-            <img :src="activity.image" :alt="activity.title" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <NuxtImg
+              :src="activity.image"
+              :alt="activity.title"
+              :width="406"
+              :height="541"
+              :quality="75"
+              loading="lazy"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
             <video
               v-if="activity.video"
               :ref="setVideoRef(index)"

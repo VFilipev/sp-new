@@ -71,7 +71,16 @@ onBeforeUnmount(() => {
               :style="{ transitionDelay: isVisible ? `${index * 150}ms` : '0ms' }"
             >
               <div class="relative h-[450px] overflow-hidden">
-                <img :src="image.src" :alt="image.alt" class="h-full w-full object-cover" />
+                <NuxtImg
+                  :src="image.src"
+                  :alt="image.alt"
+                  :width="414"
+                  :height="552"
+                  :quality="75"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  class="h-full w-full object-cover"
+                />
               </div>
             </div>
           </div>
@@ -85,9 +94,14 @@ onBeforeUnmount(() => {
               :style="{ transitionDelay: isVisible ? `${(index + 2) * 150}ms` : '0ms' }"
             >
               <div class="relative h-[296px] overflow-hidden">
-                <img
+                <NuxtImg
                   :src="image.src"
                   :alt="image.alt"
+                  :width="414"
+                  :height="296"
+                  :quality="75"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   class="h-full w-full object-cover"
                   :style="{ objectPosition: image.position }"
                 />
@@ -104,7 +118,16 @@ onBeforeUnmount(() => {
               :style="{ transitionDelay: isVisible ? `${(index + 5) * 150}ms` : '0ms' }"
             >
               <div class="relative h-[450px] overflow-hidden">
-                <img :src="image.src" :alt="image.alt" class="h-full w-full object-cover" />
+                <NuxtImg
+                  :src="image.src"
+                  :alt="image.alt"
+                  :width="414"
+                  :height="552"
+                  :quality="75"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  class="h-full w-full object-cover"
+                />
               </div>
             </div>
           </div>
@@ -118,7 +141,16 @@ onBeforeUnmount(() => {
       >
         <div class="overflow-hidden rounded-2xl border border-border/50 bg-card/80 shadow-2xl backdrop-blur">
           <div class="relative">
-            <img :src="basePlanImage" alt="План базы отдыха Строгановские Просторы" class="h-auto w-full" />
+            <NuxtImg
+              :src="basePlanImage"
+              alt="План базы отдыха Строгановские Просторы"
+              :width="694"
+              :height="486"
+              :quality="75"
+              loading="lazy"
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              class="h-auto w-full"
+            />
             <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
           </div>
         </div>
