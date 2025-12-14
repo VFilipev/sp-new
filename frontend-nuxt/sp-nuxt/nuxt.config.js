@@ -64,17 +64,25 @@ export default defineNuxtConfig({
 
   // SEO настройки
   site: {
-    url: process.env.SITE_URL || 'http://localhost:3000',
+    // Очищаем URL от символа §, если он там есть
+    url: (process.env.SITE_URL || 'http://localhost:3000').replace(/[§]/g, ''),
     name: 'Строгановские Просторы',
     description: 'Уютные коттеджи и глэмпинг на берегу камского моря',
     defaultLocale: 'ru',
+  },
+
+  // Настройки sitemap
+  sitemap: {
+    // Настраиваем hostname, очищая от символа §
+    hostname: (process.env.SITE_URL || 'http://localhost:3000').replace(/[§]/g, '').replace(/\/$/, ''),
   },
 
   // Настройки robots.txt
   robots: {
     allow: ['/'],
     disallow: ['/admin/', '/api/'],
-    // Формируем правильный URL sitemap, убирая возможные лишние символы
+    // Указываем только наш sitemap URL от Django API
+    // Файл server/routes/sitemap.xml.js переименован, чтобы модуль не находил его автоматически
     sitemap: (() => {
       const siteUrl = (process.env.SITE_URL || 'http://localhost:3000').replace(/[§]/g, '');
       // Убеждаемся, что URL заканчивается правильно
