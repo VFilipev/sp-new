@@ -1,13 +1,13 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import basePlanImage from '~/assets/resort/base-plan.jpg'
-import windowView from '~/assets/resort/gallery-window-view.jpg'
-import pierWinter from '~/assets/resort/gallery-pier-winter.jpg'
-import rabbitImage from '~/assets/resort/gallery-rabbit.jpg'
-import tubingImage from '~/assets/resort/gallery-tubing.jpg'
-import forestWalk from '~/assets/resort/gallery-forest-walk.jpg'
-import goatImage from '~/assets/resort/gallery-goat.jpg'
-import skiingImage from '~/assets/resort/gallery-skiing.jpg'
+import basePlanImage from '~/assets/resort/base-plan.webp'
+import windowView from '~/assets/resort/gallery-window-view.webp'
+import pierWinter from '~/assets/resort/gallery-pier-winter.webp'
+import rabbitImage from '~/assets/resort/gallery-rabbit.webp'
+import tubingImage from '~/assets/resort/gallery-tubing.webp'
+import forestWalk from '~/assets/resort/gallery-forest-walk.webp'
+import goatImage from '~/assets/resort/gallery-goat.webp'
+import skiingImage from '~/assets/resort/gallery-skiing.webp'
 
 const isVisible = ref(false)
 const sectionRef = ref(null)
