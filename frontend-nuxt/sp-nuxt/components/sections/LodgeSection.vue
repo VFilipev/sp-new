@@ -1,9 +1,9 @@
 <script setup>
 import { computed, defineAsyncComponent, onBeforeUnmount, ref, watch } from 'vue'
-import cottageImage from '~/assets/resort/cottage-exterior.jpg'
-import cottageInterior from '~/assets/resort/cottage-interior.jpg'
-import modularImage from '~/assets/resort/modular-house.jpg'
-import banyaImage from '~/assets/resort/banya-exterior.jpg'
+import cottageImage from '~/assets/resort/cottage-exterior.webp'
+import cottageInterior from '~/assets/resort/cottage-interior.webp'
+import modularImage from '~/assets/resort/modular-house.webp'
+import banyaImage from '~/assets/resort/banya-exterior.webp'
 
 // Lazy loading для тяжелого модального компонента
 const LodgeModal = defineAsyncComponent(() =>

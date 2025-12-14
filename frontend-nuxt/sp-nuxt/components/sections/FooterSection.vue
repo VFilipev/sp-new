@@ -1,5 +1,5 @@
 <script setup>
-import nationalProjectsLogo from "~/assets/resort/national-projects-logo.png";
+import nationalProjectsLogo from "~/assets/resort/national-projects-logo.webp";
 const currentYear = new Date().getFullYear();
 </script>
 

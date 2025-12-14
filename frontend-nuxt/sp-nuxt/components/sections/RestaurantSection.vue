@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { Coffee, Sun, Moon } from "lucide-vue-next";
-import rest1Image from "~/assets/resort/rest1.jpg";
-import rest2Image from "~/assets/resort/rest2.jpg";
-import rest3Image from "~/assets/resort/rest3.jpg";
+import rest1Image from "~/assets/resort/rest1.webp";
+import rest2Image from "~/assets/resort/rest2.webp";
+import rest3Image from "~/assets/resort/rest3.webp";
 
 const isVisible = ref(false);
 const activeIndex = ref(0);

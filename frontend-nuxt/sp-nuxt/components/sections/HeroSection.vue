@@ -3,7 +3,8 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useHead } from "#imports";
 import heroImage from "~/assets/resort/hero-cottages.webp";
 import { Phone } from "lucide-vue-next";
-import logo from "~/assets/resort/logo.png";
+import logo from "~/assets/resort/logo.webp";
+import nac from "~/assets/resort/nac.webp";
 
 // Компонент использует window API для parallax эффекта, поэтому рендерится только на клиенте
 
@@ -36,6 +37,16 @@ useHead(() => ({
       href: heroPreloadSrc.value,
       fetchpriority: "high",
       ...(heroPreloadSrc.value?.startsWith("http") ? { crossorigin: "anonymous" } : {}),
+    },
+    {
+      rel: "preload",
+      as: "image",
+      href: logo,
+    },
+    {
+      rel: "preload",
+      as: "image",
+      href: nac,
     },
   ],
 }))
@@ -86,7 +97,7 @@ onBeforeUnmount(() => {
     class="relative flex min-h-screen items-center justify-center overflow-hidden"
   >
   <div class="absolute inset-0 z-0">
-    <img
+    <NuxtImg
       :src="heroImageSrc"
       alt="Коттеджи базы отдыха Строгановские Просторы зимой"
       class="h-full w-full object-cover transition-transform duration-200 ease-out"
@@ -95,6 +106,9 @@ onBeforeUnmount(() => {
       decoding="async"
       fetchpriority="high"
       sizes="100vw"
+      :preload="true"
+      format="webp"
+      :placeholder="heroImage"
     />
     <div
       class="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/50 to-primary/70"
@@ -105,16 +119,24 @@ onBeforeUnmount(() => {
     <div class="container mx-auto flex items-center justify-between">
       <div class="flex items-center gap-8">
         <div class="flex items-center">
-          <img
+          <NuxtImg
             :src="logo"
             alt="Строгановские Просторы"
             class="h-12 transition-transform duration-300 hover:scale-105 md:h-16"
+            loading="lazy"
+            decoding="async"
+            sizes="140px"
+            :preload="true"
           />
           <div class="h-24 w-px bg-white mx-[0.8rem]"></div>
-          <img
-            src="~/assets/resort/nac.png"
+          <NuxtImg
+            :src="nac"
             alt="национальные проекты"
             class="h-24"
+            loading="lazy"
+            decoding="async"
+            sizes="150px"
+            :preload="true"
           />
         </div>
         <a

@@ -1,5 +1,5 @@
 <script setup>
-import basePlanImage from '~/assets/resort/base-plan.jpg'
+import basePlanImage from '~/assets/resort/base-plan.webp'
 </script>
 
 <template>

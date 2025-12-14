@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import snowmobileImage from '~/assets/resort/active-snowmobile.jpg'
-import skatingImage from '~/assets/resort/active-skating.jpg'
-import skiingImage from '~/assets/resort/active-skiing.jpg'
+import snowmobileImage from '~/assets/resort/active-snowmobile.webp'
+import skatingImage from '~/assets/resort/active-skating.webp'
+import skiingImage from '~/assets/resort/active-skiing.webp'
 import skatingVideo from '~/assets/resort/active-skating-video.mp4'
 import snowmobileVideo from '~/assets/resort/active-snowmobile-video.mp4'
 

@@ -1,7 +1,7 @@
 <script setup>
-import forestWalkImage from '~/assets/resort/peaceful-forest-walk.jpg'
-import windowViewImage from '~/assets/resort/peaceful-window-view.jpg'
-import banyaImage from '~/assets/resort/peaceful-banya.jpg'
+import forestWalkImage from '~/assets/resort/peaceful-forest-walk.webp'
+import windowViewImage from '~/assets/resort/peaceful-window-view.webp'
+import banyaImage from '~/assets/resort/peaceful-banya.webp'
 
 const activities = [
   { image: forestWalkImage, title: 'Прогулки по лесу', description: 'Хвойный лес и живописные тропы' },

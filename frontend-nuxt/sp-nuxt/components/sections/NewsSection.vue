@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import news1Image from '~/assets/resort/news1.jpg'
-import news2Image from '~/assets/resort/news2.jpg'
-import news3Image from '~/assets/resort/news3.jpg'
-import news4Image from '~/assets/resort/news4.jpg'
+import news1Image from '~/assets/resort/news1.webp'
+import news2Image from '~/assets/resort/news2.webp'
+import news3Image from '~/assets/resort/news3.webp'
+import news4Image from '~/assets/resort/news4.webp'
 
 const isVisible = ref(false)
 const sectionRef = ref(null)
