@@ -101,11 +101,16 @@ sitemap_view = lambda request: sitemap(request, sitemaps)
 @api_view(['GET'])
 def robots_txt(request):
     """Генерирует robots.txt"""
-    content = """User-agent: *
+    # Динамически формируем URL sitemap на основе текущего запроса
+    scheme = request.scheme  # http или https
+    host = request.get_host()  # host:port
+    sitemap_url = f"{scheme}://{host}/api/sitemap.xml"
+
+    content = f"""User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: http://localhost:8000/api/sitemap.xml
+Sitemap: {sitemap_url}
 """
     return HttpResponse(content, content_type='text/plain')
