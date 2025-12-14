@@ -27,17 +27,8 @@ const heroImageSrc = computed(() => {
   return heroImage
 })
 
-const heroPreloadSrc = computed(() => heroImageSrc.value || heroImage)
-
 useHead(() => ({
   link: [
-    {
-      rel: "preload",
-      as: "image",
-      href: heroPreloadSrc.value,
-      fetchpriority: "high",
-      ...(heroPreloadSrc.value?.startsWith("http") ? { crossorigin: "anonymous" } : {}),
-    },
     {
       rel: "preload",
       as: "image",
@@ -108,7 +99,7 @@ onBeforeUnmount(() => {
       sizes="100vw"
       :preload="true"
       format="webp"
-      :placeholder="heroImage"
+      placeholder="blur"
     />
     <div
       class="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/50 to-primary/70"
