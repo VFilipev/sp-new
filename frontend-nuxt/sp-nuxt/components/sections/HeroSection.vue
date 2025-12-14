@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useHead } from "#imports";
 import heroImage from "~/assets/resort/hero-cottages.webp";
+import heroPlaceholder from "~/assets/resort/hero-cottages-plc.webp";
 import { Phone } from "lucide-vue-next";
 import logo from "~/assets/resort/logo.webp";
 import nac from "~/assets/resort/nac.webp";
@@ -99,7 +100,7 @@ onBeforeUnmount(() => {
       sizes="100vw"
       :preload="true"
       format="webp"
-      placeholder="blur"
+      :placeholder="heroPlaceholder"
     />
     <div
       class="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/50 to-primary/70"
