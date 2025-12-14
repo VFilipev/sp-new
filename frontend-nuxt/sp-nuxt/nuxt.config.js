@@ -60,38 +60,6 @@ export default defineNuxtConfig({
     provider: 'ipx', // Встроенный провайдер
     quality: 75, // Качество по умолчанию (снижено с 80 для лучшего сжатия)
     format: ['webp', 'avif'], // Поддержка современных форматов
-    screens: {
-      xs: 320,
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      xxl: 1536,
-    },
-    presets: {
-      hero: {
-        modifiers: {
-          quality: 80,
-          format: 'webp',
-        },
-      },
-      gallery: {
-        modifiers: {
-          quality: 75,
-          format: 'webp',
-        },
-      },
-      card: {
-        modifiers: {
-          quality: 70,
-          format: 'webp',
-        },
-      },
-    },
-    // Более агрессивное сжатие для больших изображений
-    densities: [1, 2],
-    // Lazy loading по умолчанию
-    lazy: true,
   },
 
   // SEO настройки
