@@ -16,7 +16,15 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@pinia/nuxt',
     '@nuxtjs/seo',
+    '@nuxtjs/critters',
   ],
+
+  // Критический CSS и preload
+  critters: {
+    preload: 'swap',
+    pruneSource: true,
+    compress: true,
+  },
 
   // CSS
   css: ['~/assets/css/main.css'],
@@ -114,6 +122,12 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         { rel: 'canonical', href: process.env.SITE_URL || 'http://localhost:3000' },
+        // Preload шрифтов Lato для ускорения отрисовки текста
+        { rel: 'preload', as: 'font', type: 'font/ttf', href: '/fonts/Lato-Light.ttf', crossorigin: 'anonymous' },
+        { rel: 'preload', as: 'font', type: 'font/ttf', href: '/fonts/Lato-Regular.ttf', crossorigin: 'anonymous' },
+        { rel: 'preload', as: 'font', type: 'font/ttf', href: '/fonts/Lato-Medium.ttf', crossorigin: 'anonymous' },
+        { rel: 'preload', as: 'font', type: 'font/ttf', href: '/fonts/Lato-SemiBold.ttf', crossorigin: 'anonymous' },
+        { rel: 'preload', as: 'font', type: 'font/ttf', href: '/fonts/Lato-Bold.ttf', crossorigin: 'anonymous' },
       ],
     },
   },
