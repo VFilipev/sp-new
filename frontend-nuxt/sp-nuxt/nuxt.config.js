@@ -1,0 +1,127 @@
+// nuxt.config.js
+export default defineNuxtConfig({
+  // Режим рендеринга - SSR (Server-Side Rendering)
+  ssr: true, // Включен SSR
+
+  // Отключаем экспериментальные функции, которые могут вызывать проблемы с hot reload
+  experimental: {
+    payloadExtraction: false,
+    viewTransition: true,
+    watcher: 'chokidar-granular', // Более стабильный watcher
+  },
+
+  // Модули
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxt/image',
+    '@pinia/nuxt',
+    '@nuxtjs/seo',
+  ],
+
+  // CSS
+  css: ['~/assets/css/main.css'],
+
+  // Алиасы (автоматически настроены, но можно расширить)
+  alias: {
+    '@': '.',
+  },
+
+  // Настройка компонентов (автоимпорт включен по умолчанию)
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
+
+  // Переменные окружения
+  runtimeConfig: {
+    // Приватные ключи (только на сервере)
+    apiSecret: process.env.API_SECRET || '',
+
+    // Публичные ключи (доступны и на клиенте)
+    public: {
+      apiBase: process.env.API_BASE_URL || 'http://localhost:8000/api',
+      siteUrl: process.env.SITE_URL || 'http://localhost:3000',
+    },
+  },
+
+  // Оптимизация изображений
+  image: {
+    domains: ['localhost', '45.153.69.10'],
+    provider: 'ipx', // Встроенный провайдер
+    quality: 80, // Качество по умолчанию
+    format: ['webp', 'avif'], // Поддержка современных форматов
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
+  },
+
+  // SEO настройки
+  site: {
+    url: process.env.SITE_URL || 'http://localhost:3000',
+    name: 'Строгановские Просторы',
+    description: 'Уютные коттеджи и глэмпинг на берегу камского моря',
+    defaultLocale: 'ru',
+  },
+
+
+  // Настройки сборки
+  nitro: {
+    compressPublicAssets: {
+      gzip: true,
+      brotli: true,
+    },
+    prerender: {
+      crawlLinks: false, // Отключаем автоматический обход ссылок
+      failOnError: false, // Не прерывать сборку при ошибках пререндеринга
+    },
+  },
+
+  // Vite настройки (для совместимости и оптимизации)
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@use "@/assets/scss/variables.scss" as *;',
+        },
+      },
+    },
+  },
+
+  // App конфигурация
+  app: {
+    head: {
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+      title: 'Строгановские Просторы',
+      titleTemplate: '%s - Строгановские Просторы',
+      meta: [
+        { name: 'description', content: 'Уютные коттеджи и глэмпинг на берегу камского моря. Уединённый отдых в хвойном лесу с европейским уровнем комфорта.' },
+        { name: 'keywords', content: 'коттеджи, глэмпинг, отдых, Пермский край, база отдыха, Камское море, активный отдых, спокойный отдых' },
+        { name: 'author', content: 'Строгановские Просторы' },
+        { name: 'language', content: 'ru' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:locale', content: 'ru_RU' },
+        { property: 'og:site_name', content: 'Строгановские Просторы' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'canonical', href: process.env.SITE_URL || 'http://localhost:3000' },
+      ],
+    },
+  },
+
+  // Совместимость
+  compatibilityDate: '2025-07-15',
+
+  // Devtools
+  devtools: { enabled: true },
+})
+

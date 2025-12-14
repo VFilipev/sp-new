@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Подключаем шрифты Lato */
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/Lato-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/Lato-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/Lato-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/Lato-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/Lato-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/Lato-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Дизайн-система (цвета в HSL) */
+@layer base {
+  :root {
+    --background: 36 18% 91%;
+    --foreground: 165 70% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 165 70% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 165 70% 15%;
+
+    --primary: 165 70% 15%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 165 85% 30%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 10% 90%;
+    --muted-foreground: 165 20% 40%;
+
+    --accent: 165 75% 25%;
+    --accent-foreground: 0 0% 100%;
+
+    --stats-card: 168 100% 18%;
+    --stats-card-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 165 20% 80%;
+    --input: 165 20% 80%;
+    --ring: 165 70% 15%;
+
+    --radius: 0.75rem;
+    --gradient-forest: linear-gradient(135deg, hsl(165 70% 15%), hsl(165 85% 30%));
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 165 70% 10%;
+    --foreground: 210 10% 90%;
+
+    --card: 165 50% 15%;
+    --card-foreground: 210 10% 90%;
+
+    --popover: 165 50% 15%;
+    --popover-foreground: 210 10% 90%;
+
+    --primary: 165 85% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 165 60% 20%;
+    --secondary-foreground: 210 10% 90%;
+
+    --muted: 165 40% 20%;
+    --muted-foreground: 165 20% 60%;
+
+    --accent: 165 70% 25%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 165 40% 25%;
+    --input: 165 40% 25%;
+    --ring: 165 85% 35%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Lato', system-ui, -apple-system, sans-serif;
+  }
+
+  h2,
+  h3 {
+    font-weight: 300;
+  }
+}
+
+@layer components {
+  .lodge-popup-expanding {
+    animation: expandCard 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .lodge-popup-expanded {
+    top: 5vh !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 90vw !important;
+    max-width: 1152px !important;
+    height: 90vh !important;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .lodge-popup-collapsing {
+    animation: collapseCard 0.8s cubic-bezier(0.64, 0, 0.78, 0) forwards;
+  }
+
+  @keyframes expandCard {
+    from {
+      top: var(--card-top, 50%);
+      left: var(--card-left, 50%);
+      width: var(--card-width, 300px);
+      height: var(--card-height, 400px);
+      transform: translate(0, 0);
+    }
+    to {
+      top: 5vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      max-width: 1152px;
+      height: 90vh;
+    }
+  }
+
+  @keyframes collapseCard {
+    from {
+      top: 5vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      max-width: 1152px;
+      height: 90vh;
+      opacity: 1;
+    }
+    to {
+      top: var(--card-top, 50%);
+      left: var(--card-left, 50%);
+      width: var(--card-width, 300px);
+      height: var(--card-height, 400px);
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+  }
+}
+

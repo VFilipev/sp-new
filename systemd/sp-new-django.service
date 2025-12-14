@@ -1,0 +1,19 @@
+[Unit]
+Description=SP New Django Gunicorn daemon
+After=network.target
+
+[Service]
+User=YOUR_USERNAME
+Group=www-data
+WorkingDirectory=/var/www/sp-new/backend
+Environment="PATH=/var/www/sp-new/backend/venv/bin"
+ExecStart=/var/www/sp-new/backend/venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8000 \
+    --access-logfile /var/www/sp-new/logs/gunicorn-access.log \
+    --error-logfile /var/www/sp-new/logs/gunicorn-error.log \
+    config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
