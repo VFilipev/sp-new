@@ -35,6 +35,25 @@ class EventType(SEOMixin):
         format='WEBP',
         options={'quality': 85}
     )
+    # Новые варианты размеров для Event изображений
+    event_large_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(800, 600)],
+        format='WEBP',
+        options={'quality': 80}
+    )
+    event_card_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(400, 300)],
+        format='WEBP',
+        options={'quality': 75}
+    )
+    event_thumb_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(200, 150)],
+        format='WEBP',
+        options={'quality': 70}
+    )
     is_active = models.BooleanField(
         default=True,
         verbose_name='Активен'

@@ -33,4 +33,6 @@ urlpatterns = [
 # Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # В режиме разработки STATIC_URL обслуживается автоматически через runserver из папок приложений.
+    # Ручное добавление static(settings.STATIC_URL...) может конфликтовать, если STATIC_ROOT существует.
+    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

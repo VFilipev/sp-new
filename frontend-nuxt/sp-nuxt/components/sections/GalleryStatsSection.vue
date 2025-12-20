@@ -1,56 +1,32 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref, computed } from "vue";
 import basePlanImage from "~/assets/resort/base-plan.webp";
-import windowView from "~/assets/resort/gallery-window-view.webp";
-import pierWinter from "~/assets/resort/gallery-pier-winter.webp";
-import rabbitImage from "~/assets/resort/gallery-rabbit.webp";
-import tubingImage from "~/assets/resort/gallery-tubing.webp";
-import forestWalk from "~/assets/resort/gallery-forest-walk.webp";
-import goatImage from "~/assets/resort/gallery-goat.webp";
-import skiingImage from "~/assets/resort/gallery-skiing.webp";
 
 const isVisible = ref(false);
 const sectionRef = ref(null);
 
-const stats = [
-  {
-    number: "20",
-    label: "гектаров природы",
-    description: "пространство для качественного отдыха и чистая природа",
-  },
-  {
-    number: "200",
-    label: "человек вместимость",
-    description: "номерной фонд для больших компаний",
-  },
-  {
-    number: "500",
-    label: "м² для мероприятий",
-    description: "свадьбы, юбилеи, корпоративы, B2B мероприятия",
-  },
-  { number: "5", label: "выбор гостей", description: "средняя оценка яндекса" },
-  {
-    number: "365",
-    label: "дней развлечений",
-    description: "активности на каждый день, в любое время года",
-  },
-];
+const {statistics: stats, error: statisticsError} = useStatistics({ordering: 'order'});
+const { galleryImages, error: galleryError } = useGallery({ position: 'main', ordering: 'order' });
 
-const leftColumn = [
-  { src: windowView, alt: "Вид из окна на зимний лес" },
-  { src: tubingImage, alt: "Катание на тюбинге" },
-];
+// Распределяем изображения по колонкам на основе поля column
+const leftColumn = computed(() => {
+  return galleryImages.value
+    .filter(img => img.position === 'main' && img.column === 'left' && img.is_active)
+    .sort((a, b) => a.order - b.order);
+});
 
-const centerColumn = [
-  { src: rabbitImage, alt: "Контактный зоопарк - кролики", position: "center" },
-  { src: pierWinter, alt: "Зимний причал", position: "center" },
-  { src: forestWalk, alt: "Прогулка по зимнему лесу", position: "bottom" },
-];
+const centerColumn = computed(() => {
+  return galleryImages.value
+    .filter(img => img.position === 'main' && img.column === 'center' && img.is_active)
+    .sort((a, b) => a.order - b.order);
+});
 
-const rightColumn = [
-  { src: goatImage, alt: "Контактный зоопарк - козлик" },
-  { src: skiingImage, alt: "Лыжные прогулки" },
-];
+const rightColumn = computed(() => {
+  return galleryImages.value
+    .filter(img => img.position === 'main' && img.column === 'right' && img.is_active)
+    .sort((a, b) => a.order - b.order);
+});
+
 
 let observer;
 
@@ -84,7 +60,7 @@ onBeforeUnmount(() => {
           <div class="flex flex-col gap-3">
             <div
               v-for="(image, index) in leftColumn"
-              :key="`left-${index}`"
+              :key="`left-${image.id}`"
               class="transform overflow-hidden rounded-sm border border-border/50 transition-all duration-700"
               :class="
                 isVisible
@@ -97,11 +73,11 @@ onBeforeUnmount(() => {
             >
               <div class="relative h-[450px] overflow-hidden">
                 <NuxtImg
-                  :src="image.src"
-                  :alt="image.alt"
+                  :src="image.image_webp_url"
+                  :alt="image.alt_text || 'Изображение галереи'"
                   :width="414"
                   :height="552"
-                  :quality="75"
+                  :placeholder="image.image_placeholder_url"
                   loading="lazy"
                   sizes="414px"
                   class="h-full w-full object-cover"
@@ -113,7 +89,7 @@ onBeforeUnmount(() => {
           <div class="flex flex-col gap-3">
             <div
               v-for="(image, index) in centerColumn"
-              :key="`center-${index}`"
+              :key="`center-${image.id}`"
               class="transform overflow-hidden rounded-sm border border-border/50 transition-all duration-700"
               :class="
                 isVisible
@@ -126,15 +102,14 @@ onBeforeUnmount(() => {
             >
               <div class="relative h-[296px] overflow-hidden">
                 <NuxtImg
-                  :src="image.src"
-                  :alt="image.alt"
+                  :src="image.image_webp_url"
+                  :alt="image.alt_text || 'Изображение галереи'"
                   :width="414"
                   :height="296"
-                  :quality="75"
+                  :placeholder="image.image_placeholder_url"
                   loading="lazy"
                   sizes="414px"
                   class="h-full w-full object-cover"
-                  :style="{ objectPosition: image.position }"
                 />
               </div>
             </div>
@@ -143,7 +118,7 @@ onBeforeUnmount(() => {
           <div class="flex flex-col gap-3">
             <div
               v-for="(image, index) in rightColumn"
-              :key="`right-${index}`"
+              :key="`right-${image.id}`"
               class="transform overflow-hidden rounded-sm border border-border/50 transition-all duration-700"
               :class="
                 isVisible
@@ -156,11 +131,11 @@ onBeforeUnmount(() => {
             >
               <div class="relative h-[450px] overflow-hidden">
                 <NuxtImg
-                  :src="image.src"
-                  :alt="image.alt"
+                  :src="image.image_webp_url"
+                  :alt="image.alt_text || 'Изображение галереи'"
                   :width="414"
                   :height="552"
-                  :quality="75"
+                  :placeholder="image.image_placeholder_url"
                   loading="lazy"
                   sizes="414px"
                   class="h-full w-full object-cover"
@@ -226,7 +201,7 @@ onBeforeUnmount(() => {
         <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
           <div
             v-for="(stat, index) in stats"
-            :key="stat.number"
+            :key="stat?.id"
             class="group transform bg-[hsl(var(--stats-card))] p-6 text-center transition-all duration-700 rounded-2xl"
             :class="
               isVisible
@@ -241,17 +216,17 @@ onBeforeUnmount(() => {
               <div
                 class="text-4xl font-bold text-[hsl(var(--stats-card-foreground))] md:text-5xl"
               >
-                {{ stat.number }}
+                {{ stat?.number }}
               </div>
               <div
                 class="text-sm font-semibold text-[hsl(var(--stats-card-foreground)/0.9)] md:text-base"
               >
-                {{ stat.label }}
+                {{ stat?.label }}
               </div>
               <div
                 class="text-xs leading-relaxed text-[hsl(var(--stats-card-foreground)/0.7)]"
               >
-                {{ stat.description }}
+                {{ stat?.description }}
               </div>
             </div>
           </div>

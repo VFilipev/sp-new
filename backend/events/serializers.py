@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from .models import EventType
+from core.serializer_mixins import ImageVariantsMixin
 
 
-class EventTypeSerializer(serializers.ModelSerializer):
+class EventTypeSerializer(ImageVariantsMixin, serializers.ModelSerializer):
     """Сериализатор для типа мероприятия"""
     image_url = serializers.SerializerMethodField()
     image_webp_url = serializers.SerializerMethodField()
+    image_variants = serializers.SerializerMethodField()
     schema_org_json = serializers.SerializerMethodField()
     seo_fields = serializers.SerializerMethodField()
 
@@ -13,7 +15,7 @@ class EventTypeSerializer(serializers.ModelSerializer):
         model = EventType
         fields = [
             'id', 'title', 'slug', 'description', 'image_url', 'image_webp_url',
-            'is_active', 'order', 'schema_org_json', 'seo_fields'
+            'image_variants', 'is_active', 'order', 'schema_org_json', 'seo_fields'
         ]
 
     def get_image_url(self, obj):
@@ -30,7 +32,10 @@ class EventTypeSerializer(serializers.ModelSerializer):
         if obj.image:
             request = self.context.get('request')
             try:
-                webp_url = obj.image_webp.url if hasattr(obj, 'image_webp') and obj.image_webp else None
+                # Используем event_card_webp как основной вариант
+                webp_url = obj.event_card_webp.url if hasattr(obj, 'event_card_webp') and obj.event_card_webp else None
+                if not webp_url:
+                    webp_url = obj.image_webp.url if hasattr(obj, 'image_webp') and obj.image_webp else None
                 if webp_url:
                     if request:
                         return request.build_absolute_uri(webp_url)
@@ -40,6 +45,15 @@ class EventTypeSerializer(serializers.ModelSerializer):
             # Fallback на оригинальное изображение
             return self.get_image_url(obj)
         return None
+
+    def get_image_variants(self, obj):
+        """Возвращает варианты размеров изображения"""
+        variant_fields = {
+            'large': 'event_large_webp',
+            'card': 'event_card_webp',
+            'thumb': 'event_thumb_webp',
+        }
+        return super().get_image_variants(obj, variant_fields, 'image')
 
     def get_schema_org_json(self, obj):
         """Возвращает Schema.org JSON-LD"""

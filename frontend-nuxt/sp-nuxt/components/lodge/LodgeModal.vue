@@ -1,5 +1,6 @@
 <script setup>
 import { Teleport } from 'vue'
+import { useRouter } from 'vue-router'
 import ImageCarousel from './ImageCarousel.vue'
 
 const props = defineProps({
@@ -18,7 +19,41 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
+const router = useRouter()
+
 const handleClose = () => emit('close')
+
+// Маппинг имен домов из модального окна на id и тип для страницы lodge.vue
+const houseMapping = {
+  cottages: {
+    'Дом Кузнеца': { id: 1, type: 'wooden' },
+    'Дом Лесника': { id: 2, type: 'wooden' },
+    'Дом Охотника': { id: 3, type: 'wooden' },
+  },
+  modular: {
+    'Модуль Панорама': { id: 4, type: 'modular' }, // Премиум
+    'Модуль Комфорт': { id: 5, type: 'modular' }, // Комфорт
+    'Модуль Премиум': { id: 4, type: 'modular' }, // Премиум
+  },
+}
+
+const handleDetailsClick = (item) => {
+  const type = props.meta.title === 'Коттеджи' ? 'cottages' : 'modular'
+  const mapping = houseMapping[type]?.[item.name]
+
+  if (mapping) {
+    router.push({
+      path: '/lodge',
+      query: {
+        houseId: mapping.id,
+        houseType: mapping.type,
+      },
+    })
+  } else {
+    // Fallback: просто переходим на страницу lodge
+    router.push('/lodge')
+  }
+}
 </script>
 
 <template>
@@ -103,6 +138,7 @@ const handleClose = () => emit('close')
                     <div class="flex justify-end">
                       <button
                         class="rounded-full border border-primary px-5 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                        @click="handleDetailsClick(item)"
                       >
                         подробнее
                       </button>

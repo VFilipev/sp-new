@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from solo.models import SingletonModel
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+from .image_processors import SmartCropProcessor, NoOpProcessor, ResizeToFitWithPadding
 
 
 class SEOMixin(models.Model):
@@ -136,6 +137,25 @@ class SiteSettings(SingletonModel, SEOMixin):
         null=True,
         verbose_name='Главное изображение'
     )
+    # Варианты размеров для hero_image
+    hero_image_full_webp = ImageSpecField(
+        source='hero_image',
+        processors=[SmartCropProcessor(1920, 1080)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    hero_image_thumb_webp = ImageSpecField(
+        source='hero_image',
+        processors=[ResizeToFill(400, 225)],
+        format='WEBP',
+        options={'quality': 75}
+    )
+    hero_image_placeholder_webp = ImageSpecField(
+        source='hero_image',
+        processors=[NoOpProcessor()],
+        format='WEBP',
+        options={'quality': 50}
+    )
     hero_title = models.CharField(
         max_length=255,
         blank=True,
@@ -152,6 +172,25 @@ class SiteSettings(SingletonModel, SEOMixin):
         blank=True,
         null=True,
         verbose_name='Изображение плана базы'
+    )
+    # Варианты размеров для base_plan_image
+    plan_full_webp = ImageSpecField(
+        source='base_plan_image',
+        processors=[ResizeToFill(1388, 972)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    plan_thumb_webp = ImageSpecField(
+        source='base_plan_image',
+        processors=[ResizeToFill(400, 280)],
+        format='WEBP',
+        options={'quality': 75}
+    )
+    plan_placeholder_webp = ImageSpecField(
+        source='base_plan_image',
+        processors=[NoOpProcessor()],
+        format='WEBP',
+        options={'quality': 50}
     )
     base_plan_description = models.TextField(
         blank=True,
@@ -212,15 +251,46 @@ class GalleryImage(models.Model):
         ('activity', 'Активности'),
     ]
 
+    COLUMN_CHOICES = [
+        ('left', 'Левая колонка'),
+        ('center', 'Центральная колонка'),
+        ('right', 'Правая колонка'),
+    ]
+
     image = models.ImageField(
         upload_to='gallery/',
         verbose_name='Изображение'
     )
     image_webp = ImageSpecField(
         source='image',
-        processors=[ResizeToFill(1920, 1080)],
+        processors=[NoOpProcessor()],
         format='WEBP',
         options={'quality': 85}
+    )
+    # Новые варианты размеров для Gallery изображений
+    gallery_large_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(1410, 940)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    gallery_medium_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(626, 456)],
+        format='WEBP',
+        options={'quality': 80}
+    )
+    gallery_small_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(414, 296)],
+        format='WEBP',
+        options={'quality': 75}
+    )
+    gallery_placeholder_webp = ImageSpecField(
+        source='image',
+        processors=[NoOpProcessor()],
+        format='WEBP',
+        options={'quality': 50}
     )
     alt_text = models.CharField(
         max_length=255,
@@ -236,6 +306,14 @@ class GalleryImage(models.Model):
         verbose_name='Позиция',
         help_text='Где отображается изображение'
     )
+    column = models.CharField(
+        max_length=10,
+        choices=COLUMN_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name='Колонка',
+        help_text='Колонка для основной галереи (left/center/right). Используется только для position="main"'
+    )
     order = models.PositiveIntegerField(
         default=0,
         verbose_name='Порядок сортировки'
@@ -248,7 +326,7 @@ class GalleryImage(models.Model):
     class Meta:
         verbose_name = 'Изображение галереи'
         verbose_name_plural = 'Изображения галереи'
-        ordering = ['position', 'order', 'id']
+        ordering = ['position', 'column', 'order', 'id']
 
     def __str__(self):
         return f'{self.get_position_display()} - {self.alt_text or "Без названия"}'
@@ -287,6 +365,25 @@ class HeroSection(SEOMixin):
         processors=[ResizeToFill(1920, 1080)],
         format='WEBP',
         options={'quality': 85}
+    )
+    # Новые варианты размеров для preview_image
+    preview_image_hero_full_webp = ImageSpecField(
+        source='preview_image',
+        processors=[SmartCropProcessor(1920, 1080)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    preview_image_hero_thumb_webp = ImageSpecField(
+        source='preview_image',
+        processors=[ResizeToFill(400, 225)],
+        format='WEBP',
+        options={'quality': 75}
+    )
+    preview_image_hero_placeholder_webp = ImageSpecField(
+        source='preview_image',
+        processors=[NoOpProcessor()],
+        format='WEBP',
+        options={'quality': 50}
     )
     promo_video = models.FileField(
         upload_to='hero/videos/',
@@ -384,6 +481,25 @@ class HeroImage(models.Model):
         processors=[ResizeToFill(1920, 1080)],
         format='WEBP',
         options={'quality': 85}
+    )
+    # Новые варианты размеров для Hero изображений
+    hero_full_webp = ImageSpecField(
+        source='image',
+        processors=[SmartCropProcessor(1920, 1080)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    hero_thumb_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(400, 225)],
+        format='WEBP',
+        options={'quality': 75}
+    )
+    hero_placeholder_webp = ImageSpecField(
+        source='image',
+        processors=[NoOpProcessor()],
+        format='WEBP',
+        options={'quality': 50}
     )
     alt_text = models.CharField(
         max_length=255,

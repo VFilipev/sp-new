@@ -4,6 +4,7 @@ from solo.models import SingletonModel
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from core.models import SEOMixin
+from core.image_processors import NoOpProcessor
 
 
 class Restaurant(SingletonModel, SEOMixin):
@@ -88,6 +89,25 @@ class RestaurantImage(models.Model):
         processors=[ResizeToFill(1920, 1080)],
         format='WEBP',
         options={'quality': 85}
+    )
+    # Новые варианты размеров для Restaurant изображений
+    restaurant_large_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(1200, 900)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    restaurant_card_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(600, 450)],
+        format='WEBP',
+        options={'quality': 80}
+    )
+    restaurant_placeholder_webp = ImageSpecField(
+        source='image',
+        processors=[NoOpProcessor()],
+        format='WEBP',
+        options={'quality': 50}
     )
     alt_text = models.CharField(
         max_length=255,

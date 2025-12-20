@@ -1,15 +1,22 @@
 from rest_framework import serializers
 from .models import Restaurant, RestaurantImage, MealType, RestaurantBenefit
+from core.serializer_mixins import ImageVariantsMixin
 
 
-class RestaurantImageSerializer(serializers.ModelSerializer):
+class RestaurantImageSerializer(ImageVariantsMixin, serializers.ModelSerializer):
     """Сериализатор для изображений ресторана"""
     image_url = serializers.SerializerMethodField()
     image_webp_url = serializers.SerializerMethodField()
+    image_placeholder_url = serializers.SerializerMethodField()
+    image_placeholder_base64 = serializers.SerializerMethodField()
+    image_variants = serializers.SerializerMethodField()
 
     class Meta:
         model = RestaurantImage
-        fields = ['id', 'image_url', 'image_webp_url', 'alt_text', 'order']
+        fields = [
+            'id', 'image_url', 'image_webp_url', 'image_placeholder_url',
+            'image_placeholder_base64', 'image_variants', 'alt_text', 'order'
+        ]
 
     def get_image_url(self, obj):
         """Возвращает URL оригинального изображения"""
@@ -25,7 +32,10 @@ class RestaurantImageSerializer(serializers.ModelSerializer):
         if obj.image:
             request = self.context.get('request')
             try:
-                webp_url = obj.image_webp.url if hasattr(obj, 'image_webp') and obj.image_webp else None
+                # Используем restaurant_large_webp как основной вариант
+                webp_url = obj.restaurant_large_webp.url if hasattr(obj, 'restaurant_large_webp') and obj.restaurant_large_webp else None
+                if not webp_url:
+                    webp_url = obj.image_webp.url if hasattr(obj, 'image_webp') and obj.image_webp else None
                 if webp_url:
                     if request:
                         return request.build_absolute_uri(webp_url)
@@ -35,6 +45,22 @@ class RestaurantImageSerializer(serializers.ModelSerializer):
             # Fallback на оригинальное изображение
             return self.get_image_url(obj)
         return None
+
+    def get_image_placeholder_url(self, obj):
+        """Возвращает URL placeholder"""
+        return super().get_image_placeholder_url(obj, 'restaurant_placeholder_webp', 'image')
+
+    def get_image_placeholder_base64(self, obj):
+        """Возвращает base64 placeholder"""
+        return super().get_image_placeholder_base64(obj, obj.image)
+
+    def get_image_variants(self, obj):
+        """Возвращает варианты размеров изображения"""
+        variant_fields = {
+            'large': 'restaurant_large_webp',
+            'card': 'restaurant_card_webp',
+        }
+        return super().get_image_variants(obj, variant_fields, 'image')
 
 
 class MealTypeSerializer(serializers.ModelSerializer):

@@ -56,14 +56,14 @@ class StatisticAdmin(admin.ModelAdmin):
 @admin.register(GalleryImage)
 class GalleryImageAdmin(admin.ModelAdmin):
     """Админка для изображений галереи"""
-    list_display = ['alt_text', 'position', 'is_active', 'order', 'image_preview']
-    list_filter = ['position', 'is_active']
+    list_display = ['alt_text', 'position', 'column', 'is_active', 'order', 'image_preview']
+    list_filter = ['position', 'column', 'is_active']
     search_fields = ['alt_text']
-    ordering = ['position', 'order', 'id']
+    ordering = ['position', 'column', 'order', 'id']
 
     fieldsets = (
         ('Основная информация', {
-            'fields': ('image', 'alt_text', 'position', 'is_active', 'order')
+            'fields': ('image', 'alt_text', 'position', 'column', 'is_active', 'order')
         }),
     )
 

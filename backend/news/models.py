@@ -50,6 +50,25 @@ class News(SEOMixin):
         format='WEBP',
         options={'quality': 85}
     )
+    # Новые варианты размеров для News изображений
+    news_large_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(800, 600)],
+        format='WEBP',
+        options={'quality': 80}
+    )
+    news_card_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(400, 300)],
+        format='WEBP',
+        options={'quality': 75}
+    )
+    news_thumb_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(200, 150)],
+        format='WEBP',
+        options={'quality': 70}
+    )
     published_at = models.DateTimeField(
         default=timezone.now,
         verbose_name='Дата публикации',

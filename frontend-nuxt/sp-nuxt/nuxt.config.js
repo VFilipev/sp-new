@@ -56,10 +56,17 @@ export default defineNuxtConfig({
 
   // Оптимизация изображений
   image: {
+    // Используем кастомный провайдер, который возвращает исходный путь без оптимизации.
+    // Нужен чтобы оставить NuxtImg для lazy-loading, но отключить IPX/ресайзы.
+    provider: 'raw',
+    providers: {
+      raw: {
+        provider: '~/providers/raw',
+      },
+    },
     domains: ['localhost', '45.153.69.10'],
-    provider: 'ipx', // Встроенный провайдер
-    quality: 100, // Качество по умолчанию (снижено с 80 для лучшего сжатия)
-    format: ['webp', 'avif'], // Поддержка современных форматов
+    quality: 100,
+    format: [],
   },
 
   // SEO настройки

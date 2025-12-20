@@ -4,6 +4,7 @@ from django.urls import reverse
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from core.models import SEOMixin
+from core.image_processors import SmartCropProcessor, NoOpProcessor
 
 
 class LodgeType(SEOMixin):
@@ -37,6 +38,25 @@ class LodgeType(SEOMixin):
         processors=[ResizeToFill(1920, 1080)],
         format='WEBP',
         options={'quality': 85}
+    )
+    # Новые варианты размеров для hero_image
+    lodge_hero_main_webp = ImageSpecField(
+        source='hero_image',
+        processors=[SmartCropProcessor(1410, 940)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    lodge_hero_card_webp = ImageSpecField(
+        source='hero_image',
+        processors=[ResizeToFill(626, 456)],
+        format='WEBP',
+        options={'quality': 80}
+    )
+    lodge_hero_placeholder_webp = ImageSpecField(
+        source='hero_image',
+        processors=[NoOpProcessor()],
+        format='WEBP',
+        options={'quality': 50}
     )
     description = models.TextField(
         blank=True,
@@ -217,6 +237,31 @@ class LodgeImage(models.Model):
         processors=[ResizeToFill(1920, 1080)],
         format='WEBP',
         options={'quality': 85}
+    )
+    # Новые варианты размеров для Lodge изображений
+    lodge_main_webp = ImageSpecField(
+        source='image',
+        processors=[SmartCropProcessor(1410, 940)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    lodge_card_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(626, 456)],
+        format='WEBP',
+        options={'quality': 80}
+    )
+    lodge_thumb_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(300, 214)],
+        format='WEBP',
+        options={'quality': 75}
+    )
+    lodge_placeholder_webp = ImageSpecField(
+        source='image',
+        processors=[NoOpProcessor()],
+        format='WEBP',
+        options={'quality': 50}
     )
     alt_text = models.CharField(
         max_length=255,
