@@ -43,6 +43,18 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['45.153.69.10', 'localhost', '127.0.0.1']
 
+# Источники, которым доверяем при проверке CSRF (важно для нестандартного порта на проде)
+CSRF_TRUSTED_ORIGINS = [
+    "http://45.153.69.10:8009",
+]
+extra_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+if extra_csrf_origins:
+    CSRF_TRUSTED_ORIGINS += [
+        origin.strip()
+        for origin in extra_csrf_origins.split(',')
+        if origin.strip()
+    ]
+
 
 # Application definition
 
