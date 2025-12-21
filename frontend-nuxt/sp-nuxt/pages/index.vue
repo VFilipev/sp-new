@@ -67,16 +67,23 @@ useStructuredData({
 
 <template>
   <div class="min-h-screen bg-background text-foreground">
-    <!-- Компоненты сами запрашивают свои данные -->
+    <!-- Критичные компоненты для первого рендера - загружаются сразу -->
     <HeroSection />
     <GalleryStatsSection />
-    <LodgeSection />
-    <PeacefulRestSection />
-    <ActiveRestSection />
-    <EventsSection />
-    <RestaurantSection />
-    <NewsSection />
-    <FooterSection />
+
+    <!-- Компоненты ниже первого экрана - lazy loading для ускорения SSR -->
+    <!-- Используем ClientOnly для компонентов, которые не критичны для SEO -->
+    <ClientOnly>
+      <LazyLodgeSection />
+      <LazyPeacefulRestSection />
+      <LazyActiveRestSection />
+      <LazyEventsSection />
+      <LazyRestaurantSection />
+      <LazyNewsSection />
+    </ClientOnly>
+
+    <!-- Footer всегда рендерится для SEO -->
+    <LazyFooterSection />
   </div>
 </template>
 
