@@ -69,7 +69,12 @@ useStructuredData({
   <div class="min-h-screen bg-background text-foreground">
     <!-- Критичные компоненты для первого рендера - загружаются сразу -->
     <HeroSection />
-    <GalleryStatsSection />
+
+    <!-- GalleryStatsSection обернут в ClientOnly, так как он использует API gallery,
+         который генерирует варианты изображений на лету и блокирует SSR на 4+ секунды -->
+    <ClientOnly>
+      <GalleryStatsSection />
+    </ClientOnly>
 
     <!-- Компоненты ниже первого экрана - lazy loading для ускорения SSR -->
     <!-- Используем ClientOnly для компонентов, которые не критичны для SEO -->

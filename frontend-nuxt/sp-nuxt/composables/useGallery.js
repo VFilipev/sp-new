@@ -19,11 +19,13 @@ export const useGallery = (options = {}) => {
     url += `?${queryParams.join('&')}`
   }
 
-  // Используем useFetch для SSR поддержки
+  // Используем useFetch БЕЗ SSR для ускорения первого рендера
+  // Gallery не критична для SEO и может загружаться на клиенте
+  // Это предотвращает блокировку SSR из-за генерации вариантов изображений ImageKit
   const { data, error } = useFetch(url, {
     key: `gallery-${position || 'all'}-${ordering}`,
     default: () => [],
-    server: true, // Выполняется на сервере для SSR
+    server: false, // Отключаем SSR - загружаем только на клиенте
   })
 
   // Обрабатываем ответ от Django REST Framework (может быть объект с пагинацией)

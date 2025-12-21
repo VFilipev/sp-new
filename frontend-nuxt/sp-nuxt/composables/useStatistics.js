@@ -2,12 +2,12 @@ export const useStatistics = (options = {}) => {
   const config = useRuntimeConfig()
   const apiBase = config.public.apiBase
 
-  // Используем useFetch для SSR поддержки
-  // useFetch работает синхронно в контексте setup (Nuxt 3 автоматически обрабатывает await)
+  // Используем useFetch БЕЗ SSR для ускорения первого рендера
+  // Статистика не критична для SEO и может загружаться на клиенте
   const { data, error } = useFetch(`${apiBase}/statistics/`, {
     key: 'statistics',
     default: () => [],
-    server: true, // Выполняется на сервере для SSR
+    server: false, // Отключаем SSR - загружаем только на клиенте
     ...options,
   })
 

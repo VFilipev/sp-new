@@ -8,14 +8,13 @@ class RestaurantImageSerializer(ImageVariantsMixin, serializers.ModelSerializer)
     image_url = serializers.SerializerMethodField()
     image_webp_url = serializers.SerializerMethodField()
     image_placeholder_url = serializers.SerializerMethodField()
-    image_placeholder_base64 = serializers.SerializerMethodField()
     image_variants = serializers.SerializerMethodField()
 
     class Meta:
         model = RestaurantImage
         fields = [
             'id', 'image_url', 'image_webp_url', 'image_placeholder_url',
-            'image_placeholder_base64', 'image_variants', 'alt_text', 'order'
+            'image_variants', 'alt_text', 'order'
         ]
 
     def get_image_url(self, obj):
@@ -49,10 +48,6 @@ class RestaurantImageSerializer(ImageVariantsMixin, serializers.ModelSerializer)
     def get_image_placeholder_url(self, obj):
         """Возвращает URL placeholder"""
         return super().get_image_placeholder_url(obj, 'restaurant_placeholder_webp', 'image')
-
-    def get_image_placeholder_base64(self, obj):
-        """Возвращает base64 placeholder"""
-        return super().get_image_placeholder_base64(obj, obj.image)
 
     def get_image_variants(self, obj):
         """Возвращает варианты размеров изображения"""

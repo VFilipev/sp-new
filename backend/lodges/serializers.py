@@ -8,14 +8,13 @@ class LodgeImageSerializer(ImageVariantsMixin, serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     image_webp_url = serializers.SerializerMethodField()
     image_placeholder_url = serializers.SerializerMethodField()
-    image_placeholder_base64 = serializers.SerializerMethodField()
     image_variants = serializers.SerializerMethodField()
 
     class Meta:
         model = LodgeImage
         fields = [
             'id', 'image_url', 'image_webp_url', 'image_placeholder_url',
-            'image_placeholder_base64', 'image_variants', 'alt_text', 'order'
+            'image_variants', 'alt_text', 'order'
         ]
 
     def get_image_url(self, obj):
@@ -49,10 +48,6 @@ class LodgeImageSerializer(ImageVariantsMixin, serializers.ModelSerializer):
     def get_image_placeholder_url(self, obj):
         """Возвращает URL placeholder"""
         return super().get_image_placeholder_url(obj, 'lodge_placeholder_webp', 'image')
-
-    def get_image_placeholder_base64(self, obj):
-        """Возвращает base64 placeholder"""
-        return super().get_image_placeholder_base64(obj, obj.image)
 
     def get_image_variants(self, obj):
         """Возвращает варианты размеров изображения"""
@@ -110,7 +105,6 @@ class LodgeTypeSerializer(ImageVariantsMixin, serializers.ModelSerializer):
     hero_image_url = serializers.SerializerMethodField()
     hero_image_webp_url = serializers.SerializerMethodField()
     hero_image_placeholder_url = serializers.SerializerMethodField()
-    hero_image_placeholder_base64 = serializers.SerializerMethodField()
     hero_image_variants = serializers.SerializerMethodField()
     seo_fields = serializers.SerializerMethodField()
 
@@ -118,7 +112,7 @@ class LodgeTypeSerializer(ImageVariantsMixin, serializers.ModelSerializer):
         model = LodgeType
         fields = [
             'id', 'name', 'slug', 'subtitle', 'hero_image_url', 'hero_image_webp_url',
-            'hero_image_placeholder_url', 'hero_image_placeholder_base64',
+            'hero_image_placeholder_url',
             'hero_image_variants', 'description', 'is_active', 'order',
             'lodges', 'seo_fields'
         ]
@@ -154,10 +148,6 @@ class LodgeTypeSerializer(ImageVariantsMixin, serializers.ModelSerializer):
     def get_hero_image_placeholder_url(self, obj):
         """Возвращает URL placeholder для hero_image"""
         return super().get_image_placeholder_url(obj, 'lodge_hero_placeholder_webp', 'hero_image')
-
-    def get_hero_image_placeholder_base64(self, obj):
-        """Возвращает base64 placeholder для hero_image"""
-        return super().get_image_placeholder_base64(obj, obj.hero_image)
 
     def get_hero_image_variants(self, obj):
         """Возвращает варианты размеров hero_image"""

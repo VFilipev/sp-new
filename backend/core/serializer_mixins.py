@@ -2,7 +2,6 @@
 Миксины для сериализаторов изображений
 """
 from rest_framework import serializers
-from .image_utils import generate_placeholder_base64
 
 
 class ImageVariantsMixin:
@@ -74,20 +73,4 @@ class ImageVariantsMixin:
             pass
 
         return None
-
-    def get_image_placeholder_base64(self, obj, image_field):
-        """
-        Возвращает base64 placeholder
-
-        Args:
-            obj: Объект модели
-            image_field: Поле ImageField модели
-
-        Returns:
-            str: Base64 строка для data URI или None
-        """
-        if not image_field:
-            return None
-
-        return generate_placeholder_base64(image_field)
 
