@@ -251,6 +251,10 @@ if not DEBUG:
     SESSION_SAVE_EVERY_REQUEST = False
 
 # Логирование для продакшена (важно для отладки!)
+# Создаем директорию для логов, если её нет
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -268,7 +272,7 @@ LOGGING = {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'django-error.log',
+            'filename': LOGS_DIR / 'django-error.log',
             'formatter': 'verbose',
         },
         'console': {
