@@ -49,8 +49,18 @@ export default defineNuxtConfig({
 
     // Публичные ключи (доступны и на клиенте)
     public: {
-      apiBase: process.env.API_BASE_URL || 'http://localhost:8000/api',
-      siteUrl: process.env.SITE_URL || 'http://localhost:3000',
+      // В продакшене по умолчанию ходим на публичный хост 45.153.69.10:8009,
+      // в деве остаётся localhost.
+      apiBase:
+        process.env.API_BASE_URL ||
+        (process.env.NODE_ENV === 'production'
+          ? 'http://45.153.69.10:8009/api'
+          : 'http://localhost:8000/api'),
+      siteUrl:
+        process.env.SITE_URL ||
+        (process.env.NODE_ENV === 'production'
+          ? 'http://45.153.69.10:8009'
+          : 'http://localhost:3000'),
     },
   },
 

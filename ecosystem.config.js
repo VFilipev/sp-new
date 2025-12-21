@@ -8,8 +8,11 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       PORT: 3000,
-      API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:8000/api',
-      SITE_URL: process.env.SITE_URL || 'http://45.153.69.10:8009',
+      // В продакшене по умолчанию уходим на публичный хост, чтобы SSR не подставлял localhost
+      API_BASE_URL:
+        process.env.API_BASE_URL || 'http://45.153.69.10:8009/api',
+      SITE_URL:
+        process.env.SITE_URL || 'http://45.153.69.10:8009',
     },
     // Автоперезапуск при ошибках
     autorestart: true,
