@@ -129,6 +129,7 @@ class CsrfTokenView(APIView):
 class HeroSectionPatchView(APIView):
     """PATCH активной Hero секции."""
     permission_classes = [IsSiteEditor]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def patch(self, request):
         hero = HeroSection.get_active_hero()

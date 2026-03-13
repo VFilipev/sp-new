@@ -253,7 +253,7 @@ class HeroSectionPatchSerializer(serializers.ModelSerializer):
     """Сериализатор для редактирования текстов Hero секции."""
     class Meta:
         model = HeroSection
-        fields = ['title', 'subtitle']
+        fields = ['title', 'subtitle', 'preview_image']
 
 
 class StatisticPatchSerializer(serializers.ModelSerializer):
