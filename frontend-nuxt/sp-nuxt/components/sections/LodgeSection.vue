@@ -1,99 +1,77 @@
 <script setup>
 import { computed, defineAsyncComponent, onBeforeUnmount, ref, watch } from 'vue'
-import cottageImage from '~/assets/resort/cottage-exterior.webp'
-import cottageInterior from '~/assets/resort/cottage-interior.webp'
-import modularImage from '~/assets/resort/modular-house.webp'
-import banyaImage from '~/assets/resort/banya-exterior.webp'
+import { useLodgeTypes } from '~/composables/useLodges'
 
 // Lazy loading для тяжелого модального компонента
 const LodgeModal = defineAsyncComponent(() =>
   import('~/components/lodge/LodgeModal.vue')
 )
 
+const { types: lodgeTypes } = useLodgeTypes()
+
 const selectedType = ref(null)
 const showContent = ref(false)
 const isClosing = ref(false)
 
-const cardRefs = {
-  cottages: ref(null),
-  modular: ref(null),
-}
-const setCardRef = (type) => (el) => {
-  cardRefs[type].value = el
-}
-
-const typeMeta = {
-  cottages: {
-    title: 'Коттеджи',
-    subtitle: 'Традиционные деревянные дома с террасами и мангальными зонами',
-    heroImage: cottageImage,
-    items: [
-      {
-        name: 'Дом Кузнеца',
-        description: '2 смежные и 2 изолированные спальни, просторная кухня-гостиная, санузел',
-        capacityNum: 11,
-        area: 120,
-        priceFrom: 10000,
-        images: [cottageImage, cottageInterior, banyaImage],
-      },
-      {
-        name: 'Дом Лесника',
-        description: '3 изолированные спальни, большая терраса с видом на лес, камин',
-        capacityNum: 8,
-        area: 95,
-        priceFrom: 8500,
-        images: [cottageImage, cottageInterior, banyaImage],
-      },
-      {
-        name: 'Дом Охотника',
-        description: '2 спальни, уютная гостиная с камином, мангальная зона',
-        capacityNum: 6,
-        area: 75,
-        priceFrom: 6500,
-        images: [cottageImage, cottageInterior, banyaImage],
-      },
-    ],
-  },
-  modular: {
-    title: 'Модульные дома',
-    subtitle: 'Современные дома с панорамными окнами и стильным интерьером',
-    heroImage: modularImage,
-    items: [
-      {
-        name: 'Модуль Панорама',
-        description: 'Панорамные окна с видом на реку, современный минималистичный интерьер',
-        capacityNum: 2,
-        area: 25,
-        priceFrom: 4500,
-        images: [modularImage, cottageInterior, banyaImage],
-      },
-      {
-        name: 'Модуль Комфорт',
-        description: 'Увеличенная площадь, дополнительная спальная зона, терраса',
-        capacityNum: 4,
-        area: 35,
-        priceFrom: 5500,
-        images: [modularImage, cottageInterior, banyaImage],
-      },
-      {
-        name: 'Модуль Премиум',
-        description: 'Максимальный комфорт, джакузи, камин, панорамный вид на лес',
-        capacityNum: 4,
-        area: 40,
-        priceFrom: 7500,
-        images: [modularImage, cottageInterior, banyaImage],
-      },
-    ],
-  },
+// Динамические refs для карточек
+const cardRefs = ref({})
+const setCardRef = (slug) => (el) => {
+  if (el) {
+    cardRefs.value[slug] = el
+  }
 }
 
-const modalMeta = computed(() => (selectedType.value ? typeMeta[selectedType.value] : null))
-const modalItems = computed(() => modalMeta.value?.items || [])
+// Преобразуем данные с сервера в формат для модального окна
+const modalMeta = computed(() => {
+  if (!selectedType.value || !lodgeTypes.value) return null
+
+  const type = lodgeTypes.value.find(t => t.slug === selectedType.value || t.id === selectedType.value)
+  if (!type) return null
+
+  return {
+    title: type.name,
+    subtitle: type.subtitle || type.description || '',
+    heroImage: type.hero_image_webp_url || type.hero_image_url || type.hero_image_variants?.main,
+    heroImageVariants: type.hero_image_variants,
+  }
+})
+
+// Преобразуем lodges в формат для модального окна
+const modalItems = computed(() => {
+  if (!selectedType.value || !lodgeTypes.value) return []
+
+  const type = lodgeTypes.value.find(t => t.slug === selectedType.value || t.id === selectedType.value)
+  if (!type || !type.lodges) return []
+
+  // Определяем тип домов на основе slug типа
+  let houseType = 'wooden' // по умолчанию
+  if (type.slug === 'modulnye-doma' || type.name.toLowerCase().includes('модульн')) {
+    houseType = 'modular'
+  }
+
+  return type.lodges.map(lodge => ({
+    id: lodge.id,
+    name: lodge.name,
+    slug: lodge.slug,
+    description: lodge.short_description || '',
+    capacityNum: lodge.capacity,
+    area: parseFloat(lodge.area) || 0,
+    priceFrom: parseFloat(lodge.price_from) || 0,
+    houseType: houseType, // добавляем информацию о типе
+    images: lodge.images?.map(img =>
+      img.image_webp_url || img.image_url || img.image_variants?.card
+    ) || [],
+    imageVariants: lodge.images?.map(img => img.image_variants) || [],
+  }))
+})
+
 const isOpen = computed(() => !!selectedType.value)
 
-const setCardVars = (type) => {
+const setCardVars = (slug) => {
   if (!process.client) return
-  const rect = cardRefs[type].value?.getBoundingClientRect()
+  const cardEl = cardRefs.value[slug]
+  if (!cardEl) return
+  const rect = cardEl.getBoundingClientRect()
   if (!rect) return
   document.documentElement.style.setProperty('--card-top', `${rect.top}px`)
   document.documentElement.style.setProperty('--card-left', `${rect.left}px`)
@@ -101,10 +79,10 @@ const setCardVars = (type) => {
   document.documentElement.style.setProperty('--card-height', `${rect.height}px`)
 }
 
-const handleTypeClick = (type) => {
+const handleTypeClick = (slug) => {
   if (selectedType.value) return
-  setCardVars(type)
-  selectedType.value = type
+  setCardVars(slug)
+  selectedType.value = slug
 }
 
 const handleClose = () => {
@@ -142,20 +120,22 @@ onBeforeUnmount(() => {
         <p class="mx-auto max-w-2xl text-lg text-muted-foreground">Выберите подходящий для вас вариант размещения</p>
       </div>
 
-      <div class="relative mb-8 grid gap-4 md:grid-cols-2">
+      <div v-if="lodgeTypes && lodgeTypes.length > 0" class="relative mb-8 grid gap-4 md:grid-cols-2">
         <div
-          :ref="setCardRef('cottages')"
+          v-for="type in lodgeTypes"
+          :key="type.id"
+          :ref="setCardRef(type.slug)"
           class="group relative cursor-pointer overflow-hidden rounded-2xl border border-border/60 bg-white/80"
           :class="[
-            selectedType === 'cottages' ? '!invisible !transition-none' : '',
-            selectedType && selectedType !== 'cottages' ? 'pointer-events-none opacity-30 transition-opacity duration-300' : 'hover:scale-[1.02] hover:shadow-2xl transition-all duration-300',
+            selectedType === type.slug ? '!invisible !transition-none' : '',
+            selectedType && selectedType !== type.slug ? 'pointer-events-none opacity-30 transition-opacity duration-300' : 'hover:scale-[1.02] hover:shadow-2xl transition-all duration-300',
           ]"
-          @click="handleTypeClick('cottages')"
+          @click="handleTypeClick(type.slug)"
         >
           <div class="relative h-[400px]">
             <NuxtImg
-              :src="cottageImage"
-              alt="Коттеджи"
+              :src="type.hero_image_webp_url || type.hero_image_url || type.hero_image_variants?.card"
+              :alt="type.name"
               :width="626"
               :height="456"
               :quality="75"
@@ -165,41 +145,16 @@ onBeforeUnmount(() => {
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             <div class="absolute inset-0 flex flex-col justify-end p-8">
-              <h3 class="mb-3 text-3xl font-serif text-white md:text-4xl">Коттеджи</h3>
-              <p class="mb-4 text-lg text-white/90">Традиционные деревянные дома с террасами и мангальными зонами</p>
+              <h3 class="mb-3 text-3xl font-serif text-white md:text-4xl">{{ type.name }}</h3>
+              <p class="mb-4 text-lg text-white/90">{{ type.subtitle || type.description }}</p>
               <div class="text-sm text-white/80">Нажмите, чтобы узнать больше</div>
             </div>
           </div>
         </div>
-
-        <div
-          :ref="setCardRef('modular')"
-          class="group relative cursor-pointer overflow-hidden rounded-2xl border border-border/60 bg-white/80"
-          :class="[
-            selectedType === 'modular' ? '!invisible !transition-none' : '',
-            selectedType && selectedType !== 'modular' ? 'pointer-events-none opacity-30 transition-opacity duration-300' : 'hover:scale-[1.02] hover:shadow-2xl transition-all duration-300',
-          ]"
-          @click="handleTypeClick('modular')"
-        >
-          <div class="relative h-[400px]">
-            <NuxtImg
-              :src="modularImage"
-              alt="Модульные дома"
-              :width="626"
-              :height="834"
-              :quality="75"
-              loading="lazy"
-              sizes="626px"
-              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            <div class="absolute inset-0 flex flex-col justify-end p-8">
-              <h3 class="mb-3 text-3xl font-serif text-white md:text-4xl">Модульные дома</h3>
-              <p class="mb-4 text-lg text-white/90">Современные дома с панорамными окнами и стильным интерьером</p>
-              <div class="text-sm text-white/80">Нажмите, чтобы узнать больше</div>
-            </div>
-          </div>
-        </div>
+      </div>
+      <div v-else class="relative mb-8 grid gap-4 md:grid-cols-2">
+        <div class="h-[400px] animate-pulse rounded-2xl bg-gray-200" />
+        <div class="h-[400px] animate-pulse rounded-2xl bg-gray-200" />
       </div>
 
       <ClientOnly>

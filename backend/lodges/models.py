@@ -89,7 +89,11 @@ class LodgeType(SEOMixin):
 
     def get_absolute_url(self):
         """Возвращает URL для типа размещения"""
-        return reverse('lodges:type-detail', kwargs={'slug': self.slug})
+        try:
+            return reverse('lodges:type-detail', kwargs={'slug': self.slug})
+        except:
+            # Если namespace не зарегистрирован, возвращаем простой URL
+            return f"/lodges/{self.slug}/"
 
 
 class Lodge(SEOMixin):
@@ -154,6 +158,18 @@ class Lodge(SEOMixin):
         default=0,
         verbose_name='Порядок сортировки'
     )
+    conveniences = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Удобства',
+        help_text='Список удобств через запятую (например: Wi-Fi, отопление, кухня)'
+    )
+    include = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Включено в проживание',
+        help_text='Что включено в стоимость проживания (например: Постельное белье, полотенца)'
+    )
 
     class Meta:
         verbose_name = 'Размещение'
@@ -171,7 +187,11 @@ class Lodge(SEOMixin):
 
     def get_absolute_url(self):
         """Возвращает URL для размещения"""
-        return reverse('lodges:detail', kwargs={'slug': self.slug})
+        try:
+            return reverse('lodges:detail', kwargs={'slug': self.slug})
+        except:
+            # Если namespace не зарегистрирован, возвращаем простой URL
+            return f"/lodges/{self.slug}/"
 
     def get_schema_org_json(self):
         """Генерирует JSON-LD для Schema.org (LodgingBusiness)"""
@@ -282,3 +302,67 @@ class LodgeImage(models.Model):
 
     def __str__(self):
         return f'{self.lodge.name} - Изображение {self.order}'
+
+
+class LodgePrice(models.Model):
+    """Цены для размещения"""
+    lodge = models.ForeignKey(
+        Lodge,
+        on_delete=models.CASCADE,
+        related_name='price_set',
+        verbose_name='Размещение'
+    )
+    name = models.CharField(
+        max_length=255,
+        verbose_name='Название',
+        help_text='Название тарифа (например: Будни (1-2 чел.))'
+    )
+    cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Стоимость',
+        help_text='Стоимость в рублях'
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Порядок сортировки'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Активна'
+    )
+
+    class Meta:
+        verbose_name = 'Цена размещения'
+        verbose_name_plural = 'Цены размещения'
+        ordering = ['order', 'cost']
+
+    def __str__(self):
+        return f'{self.lodge.name} - {self.name}: {self.cost} руб.'
+
+
+class LodgeAvailability(models.Model):
+    """Информация о доступности размещения"""
+    lodge = models.ForeignKey(
+        Lodge,
+        on_delete=models.CASCADE,
+        related_name='availability_set',
+        verbose_name='Размещение'
+    )
+    name = models.CharField(
+        max_length=255,
+        verbose_name='Название',
+        help_text='Описание доступности (например: Доступен для бронирования)'
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Порядок сортировки'
+    )
+
+    class Meta:
+        verbose_name = 'Доступность размещения'
+        verbose_name_plural = 'Доступность размещения'
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f'{self.lodge.name} - {self.name}'

@@ -249,6 +249,102 @@ class HeroSectionSerializer(ImageVariantsMixin, serializers.ModelSerializer):
         }
 
 
+class HeroSectionPatchSerializer(serializers.ModelSerializer):
+    """Сериализатор для редактирования текстов Hero секции."""
+    class Meta:
+        model = HeroSection
+        fields = ['title', 'subtitle']
+
+
+class StatisticPatchSerializer(serializers.ModelSerializer):
+    """Сериализатор для редактирования карточек статистики."""
+    class Meta:
+        model = Statistic
+        fields = ['number', 'label', 'description']
+
+
+class GalleryImageUploadSerializer(serializers.ModelSerializer):
+    """Создание изображения галереи через edit API."""
+    class Meta:
+        model = GalleryImage
+        fields = ['id', 'image', 'alt_text', 'position', 'column', 'order', 'is_active']
+        read_only_fields = ['id']
+
+    def validate(self, attrs):
+        position = attrs.get('position', 'main')
+        column = attrs.get('column')
+        if position == 'main' and not column:
+            raise serializers.ValidationError({
+                'column': 'Для позиции "main" необходимо указать column.'
+            })
+        return attrs
+
+
+class GalleryLayoutItemSerializer(serializers.Serializer):
+    """Одна запись раскладки галереи для bulk-обновления."""
+    target_id = serializers.IntegerField(min_value=1)
+    source_image_id = serializers.IntegerField(min_value=1, required=False, allow_null=True)
+    position = serializers.ChoiceField(choices=GalleryImage.POSITION_CHOICES)
+    column = serializers.ChoiceField(
+        choices=GalleryImage.COLUMN_CHOICES,
+        required=False,
+        allow_null=True
+    )
+    order = serializers.IntegerField(min_value=0)
+    alt_text = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    is_active = serializers.BooleanField(required=False, default=True)
+
+    def validate(self, attrs):
+        if attrs.get('position') == 'main' and not attrs.get('column'):
+            raise serializers.ValidationError({
+                'column': 'Для позиции "main" необходимо указать column.'
+            })
+        return attrs
+
+
+class GalleryLayoutApplySerializer(serializers.Serializer):
+    """Bulk payload для применения раскладки галереи."""
+    items = GalleryLayoutItemSerializer(many=True)
+
+    def validate_items(self, items):
+        if not items:
+            raise serializers.ValidationError('Список items не должен быть пустым.')
+
+        target_ids = set()
+        source_ids = set()
+        active_slots = set()
+
+        for item in items:
+            target_id = item['target_id']
+            source_id = item.get('source_image_id') or target_id
+            slot_key = (
+                item['position'],
+                item.get('column'),
+                item['order'],
+            )
+
+            if target_id in target_ids:
+                raise serializers.ValidationError(
+                    f'Дублирующийся target_id={target_id} в payload.'
+                )
+            target_ids.add(target_id)
+
+            if source_id in source_ids:
+                raise serializers.ValidationError(
+                    f'Один и тот же source_image_id={source_id} указан несколько раз.'
+                )
+            source_ids.add(source_id)
+
+            if item.get('is_active', True):
+                if slot_key in active_slots:
+                    raise serializers.ValidationError(
+                        'Конфликт активных позиций: повторяются position/column/order.'
+                    )
+                active_slots.add(slot_key)
+
+        return items
+
+
 class SiteSettingsSerializer(ImageVariantsMixin, serializers.ModelSerializer):
     """Сериализатор для настроек сайта"""
     logo_url = serializers.SerializerMethodField()

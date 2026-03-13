@@ -327,6 +327,13 @@ class GalleryImage(models.Model):
         verbose_name = 'Изображение галереи'
         verbose_name_plural = 'Изображения галереи'
         ordering = ['position', 'column', 'order', 'id']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['position', 'column', 'order'],
+                condition=models.Q(is_active=True),
+                name='uniq_gallery_active_position_column_order'
+            )
+        ]
 
     def __str__(self):
         return f'{self.get_position_display()} - {self.alt_text or "Без названия"}'

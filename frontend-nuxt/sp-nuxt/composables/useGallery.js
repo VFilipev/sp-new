@@ -22,7 +22,7 @@ export const useGallery = (options = {}) => {
   // Используем useFetch БЕЗ SSR для ускорения первого рендера
   // Gallery не критична для SEO и может загружаться на клиенте
   // Это предотвращает блокировку SSR из-за генерации вариантов изображений ImageKit
-  const { data, error } = useFetch(url, {
+  const { data, error, refresh } = useFetch(url, {
     key: `gallery-${position || 'all'}-${ordering}`,
     default: () => [],
     server: false, // Отключаем SSR - загружаем только на клиенте
@@ -60,6 +60,7 @@ export const useGallery = (options = {}) => {
     data,
     galleryImages,
     error,
+    refresh,
     getImagesByPosition,
     getImagesByColumn,
   }

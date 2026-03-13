@@ -1,227 +1,85 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import WoodenHousesSection from '~/components/lodge/WoodenHousesSection.vue'
 import ModularHousesSection from '~/components/lodge/ModularHousesSection.vue'
+import { useLodgeTypes } from '~/composables/useLodges'
+// import HeaderNavigation from '../components/sections/HeaderNavigation.vue'
 
-// Импортируем изображения
-import cottageExterior from '~/assets/resort/cottage-exterior.webp'
-import cottageInterior from '~/assets/resort/cottage-interior.webp'
-import banyaExterior from '~/assets/resort/banya-exterior.webp'
-import modularHouse from '~/assets/resort/modular-house.webp'
-import galleryForestWalk from '~/assets/resort/gallery-forest-walk.webp'
-import galleryWindowView from '~/assets/resort/gallery-window-view.webp'
-import peacefulForestWalk from '~/assets/resort/peaceful-forest-walk.webp'
-import galleryPierWinter from '~/assets/resort/gallery-pier-winter.webp'
+// Загружаем типы размещения с сервера
+const { types: lodgeTypes } = useLodgeTypes()
 
-// Моковые данные для houseList
-const mockHouseList = [
-  {
-    id: 1,
-    name: 'Дом Кузнеца',
-    slug: 'dom-kuznetsa',
-    img: cottageExterior,
-    description: '2 смежные и 2 изолированные спальни, просторная кухня-гостиная, санузел. Уютный дом для большой компании.',
-    conveniences: 'Wi-Fi, отопление, кухня, санузел, терраса',
-    include: 'Постельное белье, полотенца, посуда, бытовая химия',
-    travelLineId: '1',
-    photo_gallery_set: [
-      {
-        img: cottageExterior,
-        name: 'Внешний вид',
-      },
-      {
-        img: cottageInterior,
-        name: 'Интерьер',
-      },
-      {
-        img: banyaExterior,
-        name: 'Баня',
-      },
-      {
-        img: galleryForestWalk,
-        name: 'Окрестности',
-      },
-    ],
-    price_set: [
-      { name: 'Будни (1-2 чел.)', cost: 5000 },
-      { name: 'Будни (3-4 чел.)', cost: 8000 },
-      { name: 'Выходные (1-2 чел.)', cost: 7000 },
-      { name: 'Выходные (3-4 чел.)', cost: 10000 },
-    ],
-    special_price_set: [
-      { name: 'Новогодние праздники', cost: 15000 },
-    ],
-    availability_set: [
-      { name: 'Доступен для бронирования' },
-      { name: 'Минимум 2 ночи' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Дом Лесника',
-    slug: 'dom-lesnika',
-    img: modularHouse,
-    description: '3 изолированные спальни, большая терраса с видом на лес, камин. Идеально для семейного отдыха.',
-    conveniences: 'Wi-Fi, отопление, кухня, санузел, терраса, камин',
-    include: 'Постельное белье, полотенца, посуда, дрова для камина',
-    travelLineId: '2',
-    photo_gallery_set: [
-      {
-        img: modularHouse,
-        name: 'Внешний вид',
-      },
-      {
-        img: cottageInterior,
-        name: 'Гостиная',
-      },
-      {
-        img: galleryWindowView,
-        name: 'Вид из окна',
-      },
-      {
-        img: peacefulForestWalk,
-        name: 'Терраса',
-      },
-    ],
-    price_set: [
-      { name: 'Будни (1-2 чел.)', cost: 4500 },
-      { name: 'Будни (3-4 чел.)', cost: 7500 },
-      { name: 'Выходные (1-2 чел.)', cost: 6500 },
-      { name: 'Выходные (3-4 чел.)', cost: 9500 },
-    ],
-    special_price_set: [
-      { name: 'Новогодние праздники', cost: 14000 },
-    ],
-    availability_set: [
-      { name: 'Доступен для бронирования' },
-      { name: 'Минимум 2 ночи' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Дом Охотника',
-    slug: 'dom-ohotnika',
-    img: banyaExterior,
-    description: '2 спальни, уютная гостиная с камином, мангальная зона. Компактный и уютный дом для небольшой компании.',
-    conveniences: 'Wi-Fi, отопление, кухня, санузел, мангальная зона',
-    include: 'Постельное белье, полотенца, посуда, уголь для мангала',
-    travelLineId: '3',
-    photo_gallery_set: [
-      {
-        img: banyaExterior,
-        name: 'Внешний вид',
-      },
-      {
-        img: cottageInterior,
-        name: 'Интерьер',
-      },
-      {
-        img: galleryPierWinter,
-        name: 'Мангальная зона',
-      },
-    ],
-    price_set: [
-      { name: 'Будни (1-2 чел.)', cost: 3500 },
-      { name: 'Будни (3-4 чел.)', cost: 6000 },
-      { name: 'Выходные (1-2 чел.)', cost: 5500 },
-      { name: 'Выходные (3-4 чел.)', cost: 8500 },
-    ],
-    special_price_set: [
-      { name: 'Новогодние праздники', cost: 12000 },
-    ],
-    availability_set: [
-      { name: 'Доступен для бронирования' },
-      { name: 'Минимум 1 ночь' },
-    ],
-  },
-]
+// Функция для преобразования данных с сервера в формат для компонентов
+const transformLodgeData = (lodge) => {
+  // Преобразуем изображения из сервера в формат для галереи
+  let photoGallery = []
+  if (lodge.images && lodge.images.length > 0) {
+    // Используем реальные изображения с сервера
+    photoGallery = lodge.images.map((img, index) => ({
+      img: img.image_webp_url || img.image_url || img.image_variants?.main || img.image_variants?.card,
+      name: img.alt_text || `Фото ${index + 1}`,
+    }))
+  }
 
-// Моковые данные для модульных домов
-const mockModularHouseList = [
-  {
-    id: 4,
-    name: 'Премиум',
-    slug: 'modular-premium',
-    img: modularHouse,
-    description: 'Современный модульный дом с панорамными окнами, просторная гостиная, 2 спальни, полностью оборудованная кухня.',
-    conveniences: 'Wi-Fi, отопление, кондиционер, кухня, санузел, терраса, панорамные окна',
-    include: 'Постельное белье, полотенца, посуда, бытовая техника',
-    travelLineId: '4',
-    photo_gallery_set: [
-      {
-        img: modularHouse,
-        name: 'Внешний вид',
-      },
-      {
-        img: cottageInterior,
-        name: 'Гостиная',
-      },
-      {
-        img: galleryWindowView,
-        name: 'Панорамные окна',
-      },
-      {
-        img: peacefulForestWalk,
-        name: 'Терраса',
-      },
-    ],
-    price_set: [
-      { name: 'Будни (1-2 чел.)', cost: 6000 },
-      { name: 'Будни (3-4 чел.)', cost: 9000 },
-      { name: 'Выходные (1-2 чел.)', cost: 8000 },
-      { name: 'Выходные (3-4 чел.)', cost: 12000 },
-    ],
-    special_price_set: [
-      { name: 'Новогодние праздники', cost: 18000 },
-    ],
-    availability_set: [
-      { name: 'Доступен для бронирования' },
-      { name: 'Минимум 2 ночи' },
-    ],
-  },
-  {
-    id: 5,
-    name: 'Комфорт',
-    slug: 'modular-comfort',
-    img: cottageExterior,
-    description: 'Уютный модульный дом для небольшой компании. 1 спальня, компактная кухня, уютная гостиная.',
-    conveniences: 'Wi-Fi, отопление, кухня, санузел, терраса',
-    include: 'Постельное белье, полотенца, посуда',
-    travelLineId: '5',
-    photo_gallery_set: [
-      {
-        img: cottageExterior,
-        name: 'Внешний вид',
-      },
-      {
-        img: cottageInterior,
-        name: 'Интерьер',
-      },
-      {
-        img: galleryForestWalk,
-        name: 'Окрестности',
-      },
-    ],
-    price_set: [
-      { name: 'Будни (1-2 чел.)', cost: 4000 },
-      { name: 'Будни (3-4 чел.)', cost: 7000 },
-      { name: 'Выходные (1-2 чел.)', cost: 6000 },
-      { name: 'Выходные (3-4 чел.)', cost: 10000 },
-    ],
-    special_price_set: [
-      { name: 'Новогодние праздники', cost: 15000 },
-    ],
-    availability_set: [
-      { name: 'Доступен для бронирования' },
-      { name: 'Минимум 1 ночь' },
-    ],
-  },
-]
+  // Используем данные с сервера для главного изображения
+  const mainImage = photoGallery.length > 0
+    ? photoGallery[0].img
+    : ''
+
+  return {
+    id: lodge.id,
+    name: lodge.name,
+    slug: lodge.slug,
+    img: mainImage,
+    description: lodge.short_description || lodge.description || '',
+    conveniences: lodge.conveniences || '',
+    include: lodge.include || '',
+    photo_gallery_set: photoGallery,
+    price_set: lodge.price_set || [],
+    special_price_set: lodge.special_price_set || [],
+    availability_set: lodge.availability_set || [],
+  }
+}
+
+// Преобразуем данные с сервера в формат для компонентов
+const houseList = computed(() => {
+  if (!lodgeTypes.value || lodgeTypes.value.length === 0) {
+    return []
+  }
+
+  // Находим тип "Коттеджи" (деревянные дома)
+  const cottagesType = lodgeTypes.value.find(type =>
+    type.slug === 'kottedzhi' ||
+    type.name.toLowerCase().includes('коттедж') ||
+    type.name.toLowerCase().includes('деревянн')
+  )
+
+  if (cottagesType && cottagesType.lodges && cottagesType.lodges.length > 0) {
+    return cottagesType.lodges.map((lodge) => transformLodgeData(lodge))
+  }
+
+  return []
+})
+
+const modularHouseList = computed(() => {
+  if (!lodgeTypes.value || lodgeTypes.value.length === 0) {
+    return []
+  }
+
+  // Находим тип "Модульные дома"
+  const modularType = lodgeTypes.value.find(type =>
+    type.slug === 'modulnye-doma' ||
+    type.name.toLowerCase().includes('модульн')
+  )
+
+  if (modularType && modularType.lodges && modularType.lodges.length > 0) {
+    return modularType.lodges.map((lodge) => transformLodgeData(lodge))
+  }
+
+  return []
+})
 
 // Реактивные данные
-const houseList = ref(mockHouseList)
-const modularHouseList = ref(mockModularHouseList)
 const isShowModalHouse = ref(false)
 const selectLodge = ref({})
 
@@ -230,6 +88,23 @@ const woodenSectionRef = ref(null)
 const modularSectionRef = ref(null)
 
 const route = useRoute()
+
+// Computed свойства для начальных ID домов
+const initialWoodenHouseId = computed(() => {
+  if (route.query.houseType === 'wooden' && route.query.houseId) {
+    const id = parseInt(route.query.houseId)
+    return isNaN(id) ? undefined : id
+  }
+  return undefined
+})
+
+const initialModularHouseId = computed(() => {
+  if (route.query.houseType === 'modular' && route.query.houseId) {
+    const id = parseInt(route.query.houseId)
+    return isNaN(id) ? undefined : id
+  }
+  return undefined
+})
 
 const closeModal = () => {
   if (import.meta.client) {
@@ -303,18 +178,18 @@ onMounted(async () => {
   <div>
     <!-- Временно закомментированы компоненты, которые нужно будет добавить позже -->
     <!-- <header-main /> -->
-
+    <HeaderNavigation :stick="false" />
     <WoodenHousesSection
       ref="woodenSectionRef"
       :houses="houseList"
       title="Деревянные дома"
-      :initial-house-id="route.query.houseType === 'wooden' ? parseInt(route.query.houseId) : undefined"
+      :initial-house-id="initialWoodenHouseId"
     />
     <ModularHousesSection
       ref="modularSectionRef"
       :houses="modularHouseList"
       title="Модульные дома"
-      :initial-house-id="route.query.houseType === 'modular' ? parseInt(route.query.houseId) : undefined"
+      :initial-house-id="initialModularHouseId"
     />
 
   </div>

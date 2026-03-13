@@ -128,11 +128,13 @@ const currentYear = new Date().getFullYear();
             <p>
               Единый реестр объектов классификации в сфере туристской индустрии
             </p>
-            <p class="font-medium">Номер реестровой записи:</p>
+            <div class="flex">
+                <p class="font-medium">Номер реестровой записи:</p>
             <a
               href="https://tourism.fsa.gov.ru/ru/resorts/hotels/d25e4a6c-c607-11ef-92da-e7d07e8e684c/about-resort"
               >С592024018790</a
             >
+            </div>
           </div>
         </div>
       </div>

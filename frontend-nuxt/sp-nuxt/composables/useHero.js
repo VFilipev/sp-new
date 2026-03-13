@@ -4,7 +4,7 @@ export const useHero = (options = {}) => {
 
   // Используем useFetch для SSR поддержки
   // useFetch работает синхронно в контексте setup (Nuxt 3 автоматически обрабатывает await)
-  const { data, error } = useFetch(`${apiBase}/hero/`, {
+  const { data, error, refresh } = useFetch(`${apiBase}/hero/`, {
     key: 'hero',
     default: () => ({ images: [] }), // Безопасное значение по умолчанию с пустым массивом images
     server: true, // Выполняется на сервере для SSR
@@ -14,6 +14,7 @@ export const useHero = (options = {}) => {
   return {
     data,
     error,
+    refresh,
   }
 }
 

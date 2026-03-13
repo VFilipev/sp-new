@@ -1,12 +1,20 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useHead } from "#imports";
 import { Phone } from "lucide-vue-next";
 import logo from "~/assets/resort/logo.webp";
 import nac from "~/assets/resort/nac.webp";
 
+const props = defineProps({
+  editMode: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 // Компонент сам запрашивает свои данные через composable
-const { data: heroData, error: heroError } = useHero();
+const { data: heroData, error: heroError, refresh: refreshHero } = useHero();
+const { patch: patchAdminContent } = useAdminContentApi();
 
 // Логируем ошибки, но не прерываем рендеринг
 if (heroError.value) {
@@ -50,6 +58,61 @@ useHead(() => ({
 
 const scrollY = ref(0);
 const parallaxEnabled = ref(false);
+const editableTitle = ref("");
+const editableSubtitle = ref("");
+const isSaving = ref(false);
+const saveError = ref("");
+const saveSuccess = ref("");
+
+watch(
+  heroData,
+  (value) => {
+    editableTitle.value = value?.title || "";
+    editableSubtitle.value = value?.subtitle || "";
+  },
+  { immediate: true }
+);
+
+const displayedTitle = computed(() =>
+  props.editMode ? editableTitle.value : (heroData.value?.title || "")
+);
+const displayedSubtitle = computed(() =>
+  props.editMode ? editableSubtitle.value : (heroData.value?.subtitle || "")
+);
+
+const resetEditableHero = () => {
+  editableTitle.value = heroData.value?.title || "";
+  editableSubtitle.value = heroData.value?.subtitle || "";
+};
+
+const hasHeroChanges = computed(() => {
+  return (
+    editableTitle.value !== (heroData.value?.title || "") ||
+    editableSubtitle.value !== (heroData.value?.subtitle || "")
+  );
+});
+
+const saveHero = async () => {
+  if (!hasHeroChanges.value || isSaving.value) return;
+
+  isSaving.value = true;
+  saveError.value = "";
+  saveSuccess.value = "";
+
+  try {
+    await patchAdminContent("/auth/edit/hero/active/", {
+      title: editableTitle.value,
+      subtitle: editableSubtitle.value,
+    });
+    await refreshHero();
+    resetEditableHero();
+    saveSuccess.value = "Hero секция сохранена";
+  } catch (error) {
+    saveError.value = error?.data?.detail || "Не удалось сохранить Hero секцию";
+  } finally {
+    isSaving.value = false;
+  }
+};
 
 const parallaxStyle = computed(() => {
   if (!parallaxEnabled.value) {
@@ -93,6 +156,13 @@ onBeforeUnmount(() => {
   <section
     class="relative flex min-h-screen items-center justify-center overflow-hidden"
   >
+    <div
+      v-if="editMode"
+      class="absolute left-6 top-28 z-30 rounded-xl border border-white/30 bg-black/35 px-3 py-2 text-xs font-medium text-white backdrop-blur"
+    >
+      Режим редактирования hero (превью)
+    </div>
+
     <div class="absolute inset-0 z-0">
       <NuxtImg
         :src="heroImageSrc"
@@ -156,8 +226,8 @@ onBeforeUnmount(() => {
           >
           <a
             class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
-            href="#active"
-            >туры</a
+            href="/event-calculator"
+            >мероприятия</a
           >
           <a
             class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
@@ -195,8 +265,16 @@ onBeforeUnmount(() => {
             <p
               class="text-2xl font-light leading-relaxed text-primary-foreground md:text-3xl"
             >
-              {{ heroData?.title }}
+              {{ displayedTitle }}
             </p>
+            <div v-if="editMode" class="mt-3">
+              <textarea
+                v-model="editableTitle"
+                rows="3"
+                class="w-full rounded-xl border border-white/30 bg-black/35 p-3 text-sm text-white outline-none ring-0 placeholder:text-white/70"
+                placeholder="Заголовок первого экрана"
+              />
+            </div>
           </div>
 
           <div
@@ -210,8 +288,38 @@ onBeforeUnmount(() => {
             <p
               class="text-base leading-relaxed text-primary-foreground md:text-lg"
             >
-              {{ heroData?.subtitle }}
+              {{ displayedSubtitle }}
             </p>
+            <div v-if="editMode" class="mt-3 space-y-2">
+              <textarea
+                v-model="editableSubtitle"
+                rows="4"
+                class="w-full rounded-xl border border-white/30 bg-black/35 p-3 text-sm text-white outline-none ring-0 placeholder:text-white/70"
+                placeholder="Подзаголовок первого экрана"
+              />
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  class="rounded-lg border border-white/30 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-white/10"
+                  @click="resetEditableHero"
+                >
+                  Сбросить превью
+                </button>
+                <button
+                  class="rounded-lg px-3 py-1 text-xs font-semibold transition-colors"
+                  :class="
+                    hasHeroChanges
+                      ? 'bg-white text-primary hover:bg-white/90'
+                      : 'bg-white/30 text-white/70'
+                  "
+                  :disabled="!hasHeroChanges || isSaving"
+                  @click="saveHero"
+                >
+                  {{ isSaving ? "Сохранение..." : "Сохранить Hero" }}
+                </button>
+                <span v-if="saveSuccess" class="text-xs text-green-200">{{ saveSuccess }}</span>
+                <span v-if="saveError" class="text-xs text-red-200">{{ saveError }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,13 @@
 <script setup>
 // Компоненты сами запрашивают свои данные через composables
 // Это делает архитектуру более модульной и позволяет легко создавать новые роуты
+const {
+  isAdmin,
+  adminName,
+  isEditMode,
+  pending: adminStatusPending,
+  toggleEditMode,
+} = useAdminEditMode()
 
 const config = useRuntimeConfig()
 const siteUrl = config.public.siteUrl
@@ -67,13 +74,34 @@ useStructuredData({
 
 <template>
   <div class="min-h-screen bg-background text-foreground">
+    <div
+      v-if="isAdmin"
+      class="fixed right-4 top-4 z-[60] flex items-center gap-2 rounded-full border border-primary/20 bg-background/95 p-1 shadow-lg backdrop-blur"
+    >
+      <span class="px-2 text-xs text-muted-foreground">
+        {{ adminName ? `Админ: ${adminName}` : "Админ" }}
+      </span>
+      <button
+        class="rounded-full px-3 py-2 text-xs font-semibold transition-colors"
+        :class="
+          isEditMode
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted text-foreground hover:bg-muted/80'
+        "
+        :disabled="adminStatusPending"
+        @click="toggleEditMode"
+      >
+        {{ isEditMode ? "Режим редактирования: ВКЛ" : "Режим редактирования: ВЫКЛ" }}
+      </button>
+    </div>
+
     <!-- Критичные компоненты для первого рендера - загружаются сразу -->
-    <HeroSection />
+    <HeroSection :edit-mode="isEditMode" />
 
     <!-- GalleryStatsSection обернут в ClientOnly, так как он использует API gallery,
          который генерирует варианты изображений на лету и блокирует SSR на 4+ секунды -->
     <ClientOnly>
-      <GalleryStatsSection />
+      <GalleryStatsSection :edit-mode="isEditMode" />
     </ClientOnly>
 
     <!-- Компоненты ниже первого экрана - lazy loading для ускорения SSR -->

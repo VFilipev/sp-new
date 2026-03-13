@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import LodgeType, Lodge, LodgeImage
+from .models import LodgeType, Lodge, LodgeImage, LodgePrice, LodgeAvailability
 from core.serializer_mixins import ImageVariantsMixin
 
 
@@ -59,13 +59,29 @@ class LodgeImageSerializer(ImageVariantsMixin, serializers.ModelSerializer):
         return super().get_image_variants(obj, variant_fields, 'image')
 
 
+class LodgePriceSerializer(serializers.ModelSerializer):
+    """Сериализатор для цен размещения"""
+    class Meta:
+        model = LodgePrice
+        fields = ['id', 'name', 'cost', 'order']
+
+
+class LodgeAvailabilitySerializer(serializers.ModelSerializer):
+    """Сериализатор для доступности размещения"""
+    class Meta:
+        model = LodgeAvailability
+        fields = ['id', 'name', 'order']
+
+
 class LodgeSerializer(serializers.ModelSerializer):
     """Сериализатор для размещения"""
     images = LodgeImageSerializer(many=True, read_only=True)
     lodge_type_name = serializers.CharField(source='lodge_type.name', read_only=True)
     lodge_type_slug = serializers.CharField(source='lodge_type.slug', read_only=True)
+    price_set = LodgePriceSerializer(many=True, read_only=True)
+    special_price_set = serializers.SerializerMethodField()
+    availability_set = LodgeAvailabilitySerializer(many=True, read_only=True)
     schema_org_json = serializers.SerializerMethodField()
-    breadcrumbs = serializers.SerializerMethodField()
     seo_fields = serializers.SerializerMethodField()
 
     class Meta:
@@ -73,17 +89,18 @@ class LodgeSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'lodge_type', 'lodge_type_name', 'lodge_type_slug',
             'description', 'short_description', 'capacity', 'area', 'price_from',
-            'location_description', 'is_active', 'order',
-            'images', 'schema_org_json', 'breadcrumbs', 'seo_fields'
+            'location_description', 'is_active', 'order', 'conveniences', 'include',
+            'images', 'price_set', 'special_price_set', 'availability_set',
+            'schema_org_json', 'seo_fields'
         ]
+
+    def get_special_price_set(self, obj):
+        """Возвращает пустой массив для совместимости с фронтендом"""
+        return []
 
     def get_schema_org_json(self, obj):
         """Возвращает Schema.org JSON-LD"""
         return obj.get_schema_org_json()
-
-    def get_breadcrumbs(self, obj):
-        """Возвращает хлебные крошки"""
-        return obj.get_breadcrumbs()
 
     def get_seo_fields(self, obj):
         """Возвращает SEO поля"""

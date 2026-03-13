@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { formatNumber } from '~/utils/formatNumber'
+import PhotoViewer from './PhotoViewer.vue'
 import 'swiper/css'
 
 const props = defineProps({
@@ -21,6 +22,44 @@ const props = defineProps({
 
 const selectHouseIndex = ref(0)
 const selectedHouse = computed(() => props.houses[selectHouseIndex.value])
+
+// Состояние для просмотрщика фотографий
+const photoViewerOpen = ref(false)
+const photoViewerImages = ref([])
+const photoViewerInitialIndex = ref(0)
+
+// Функция для получения всех фотографий домика
+const getAllHouseImages = (house) => {
+  const images = []
+  // Добавляем главное изображение
+  if (house.img) {
+    images.push(house.img)
+  }
+  // Добавляем фотографии из галереи
+  if (house.photo_gallery_set && house.photo_gallery_set.length > 0) {
+    house.photo_gallery_set.forEach((photo) => {
+      if (photo.img) {
+        images.push(photo.img)
+      }
+    })
+  }
+  return images
+}
+
+// Открытие просмотрщика фотографий
+const openPhotoViewer = (house, imageIndex = 0) => {
+  const images = getAllHouseImages(house)
+  if (images.length > 0) {
+    photoViewerImages.value = images
+    photoViewerInitialIndex.value = imageIndex
+    photoViewerOpen.value = true
+  }
+}
+
+// Закрытие просмотрщика
+const closePhotoViewer = () => {
+  photoViewerOpen.value = false
+}
 
 // Функция для установки индекса на основе houseId
 const setHouseIndex = (houseId) => {
@@ -116,6 +155,7 @@ const addSelectHouseIndex = () => {
                       <div
                         class="house__image"
                         :style="{ backgroundImage: `url(${house.img})` }"
+                        @click="openPhotoViewer(house, 0)"
                       ></div>
                     </div>
                   </div>
@@ -135,6 +175,7 @@ const addSelectHouseIndex = () => {
                             <div
                               class="photogalery__image"
                               :style="{ backgroundImage: `url(${card.img})` }"
+                              @click="openPhotoViewer(house, cardIndex + (house.img ? 1 : 0))"
                             ></div>
                             <div class="photogalery__name">{{ card.name }}</div>
                           </div>
@@ -145,7 +186,7 @@ const addSelectHouseIndex = () => {
                 </div>
 
                 <!-- Информация справа -->
-                <div class="col-12 col-sm-6">
+                <div class="col-12 col-sm-6" >
                   <div class="row d-none d-sm-flex" style="margin-bottom: 64px">
                     <div class="col-12">
                       <div class="house__name_description">Стоимость</div>
@@ -215,6 +256,14 @@ const addSelectHouseIndex = () => {
         </div>
       </div>
     </div>
+
+    <!-- Просмотрщик фотографий -->
+    <PhotoViewer
+      :images="photoViewerImages"
+      :initial-index="photoViewerInitialIndex"
+      :open="photoViewerOpen"
+      @close="closePhotoViewer"
+    />
   </section>
 </template>
 
@@ -349,6 +398,7 @@ const addSelectHouseIndex = () => {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  cursor: pointer;
 }
 
 .photogalery__name {
@@ -376,6 +426,7 @@ const addSelectHouseIndex = () => {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  cursor: pointer;
 }
 
 .house__name {

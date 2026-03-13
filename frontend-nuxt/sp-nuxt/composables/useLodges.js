@@ -47,8 +47,22 @@ export const useLodgeTypes = (options = {}) => {
     ...options,
   })
 
+  // Обрабатываем ответ от Django REST Framework (может быть объект с пагинацией)
+  const typesResults = computed(() => {
+    if (!types.value) return []
+    // Если это объект с пагинацией Django REST Framework, извлекаем results
+    if (typeof types.value === 'object' && 'results' in types.value) {
+      return types.value.results
+    }
+    // Если это уже массив, возвращаем как есть
+    if (Array.isArray(types.value)) {
+      return types.value
+    }
+    return []
+  })
+
   return {
-    types,
+    types: typesResults,
     typesError,
   }
 }

@@ -4,7 +4,7 @@ export const useStatistics = (options = {}) => {
 
   // Используем useFetch БЕЗ SSR для ускорения первого рендера
   // Статистика не критична для SEO и может загружаться на клиенте
-  const { data, error } = useFetch(`${apiBase}/statistics/`, {
+  const { data, error, refresh } = useFetch(`${apiBase}/statistics/`, {
     key: 'statistics',
     default: () => [],
     server: false, // Отключаем SSR - загружаем только на клиенте
@@ -29,6 +29,7 @@ export const useStatistics = (options = {}) => {
     data,
     statistics,
     error,
+    refresh,
   }
 }
 

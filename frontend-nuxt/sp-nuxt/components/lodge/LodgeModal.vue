@@ -23,34 +23,23 @@ const router = useRouter()
 
 const handleClose = () => emit('close')
 
-// Маппинг имен домов из модального окна на id и тип для страницы lodge.vue
-const houseMapping = {
-  cottages: {
-    'Дом Кузнеца': { id: 1, type: 'wooden' },
-    'Дом Лесника': { id: 2, type: 'wooden' },
-    'Дом Охотника': { id: 3, type: 'wooden' },
-  },
-  modular: {
-    'Модуль Панорама': { id: 4, type: 'modular' }, // Премиум
-    'Модуль Комфорт': { id: 5, type: 'modular' }, // Комфорт
-    'Модуль Премиум': { id: 4, type: 'modular' }, // Премиум
-  },
-}
 
 const handleDetailsClick = (item) => {
-  const type = props.meta.title === 'Коттеджи' ? 'cottages' : 'modular'
-  const mapping = houseMapping[type]?.[item.name]
-
-  if (mapping) {
+  // Всегда перенаправляем на /lodge с query параметрами
+  // чтобы открылась страница с WoodenHousesSection/ModularHousesSection
+  if (item.id && item.houseType) {
     router.push({
       path: '/lodge',
       query: {
-        houseId: mapping.id,
-        houseType: mapping.type,
+        houseId: item.id,
+        houseType: item.houseType,
       },
     })
+  } else if (item.slug) {
+    // Fallback на slug если нет id или houseType
+    router.push(`/lodge/${item.slug}`)
   } else {
-    // Fallback: просто переходим на страницу lodge
+    // Последний fallback
     router.push('/lodge')
   }
 }
@@ -112,7 +101,7 @@ const handleDetailsClick = (item) => {
               <div class="grid gap-6 md:grid-cols-3">
                 <article
                   v-for="item in items"
-                  :key="item.name"
+                  :key="item.id || item.slug || item.name"
                   class="overflow-hidden rounded-2xl border-0 bg-[#f5f2ed] shadow-sm transition-all duration-300 hover:shadow-xl"
                 >
                   <ImageCarousel :images="item.images" />
@@ -121,7 +110,7 @@ const handleDetailsClick = (item) => {
                     <div class="mb-3 flex items-center justify-between gap-2">
                       <h4 class="text-lg font-semibold text-foreground">{{ item.name }}</h4>
                       <div class="flex items-center gap-3 text-sm">
-                        <span class="font-medium text-foreground">₽ {{ item.priceFrom.toLocaleString('ru-RU') }}</span>
+                        <span class="font-medium text-foreground">₽ {{ Number(item.priceFrom || 0).toLocaleString('ru-RU') }}</span>
                         <div class="flex items-center gap-1 text-muted-foreground">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 12c2.485 0 4.5-2.015 4.5-4.5S14.485 3 12 3 7.5 5.015 7.5 7.5 9.515 12 12 12zM5.25 20.25a6.75 6.75 0 1 1 13.5 0" />
@@ -131,7 +120,7 @@ const handleDetailsClick = (item) => {
                       </div>
                     </div>
 
-                    <p class="mb-4 text-sm leading-relaxed text-muted-foreground">
+                    <p class="mb-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                       {{ item.description }}
                     </p>
 

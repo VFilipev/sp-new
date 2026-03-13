@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import LodgeType, Lodge, LodgeImage
+from .models import LodgeType, Lodge, LodgeImage, LodgePrice, LodgeAvailability
 
 
 class LodgeImageInline(admin.TabularInline):
@@ -8,6 +8,22 @@ class LodgeImageInline(admin.TabularInline):
     model = LodgeImage
     extra = 1
     fields = ['image', 'alt_text', 'order']
+    ordering = ['order']
+
+
+class LodgePriceInline(admin.TabularInline):
+    """Inline для цен размещения"""
+    model = LodgePrice
+    extra = 1
+    fields = ['name', 'cost', 'order', 'is_active']
+    ordering = ['order']
+
+
+class LodgeAvailabilityInline(admin.TabularInline):
+    """Inline для доступности размещения"""
+    model = LodgeAvailability
+    extra = 1
+    fields = ['name', 'order']
     ordering = ['order']
 
 
@@ -45,7 +61,7 @@ class LodgeAdmin(admin.ModelAdmin):
     list_filter = ['lodge_type', 'is_active']
     search_fields = ['name', 'description', 'short_description', 'location_description']
     prepopulated_fields = {'slug': ('name',)}
-    inlines = [LodgeImageInline]
+    inlines = [LodgeImageInline, LodgePriceInline, LodgeAvailabilityInline]
     ordering = ['order', 'name']
 
     fieldsets = (
@@ -54,6 +70,9 @@ class LodgeAdmin(admin.ModelAdmin):
         }),
         ('Характеристики', {
             'fields': ('capacity', 'area', 'price_from', 'location_description')
+        }),
+        ('Дополнительная информация', {
+            'fields': ('conveniences', 'include')
         }),
         ('SEO', {
             'classes': ('collapse',),
@@ -80,3 +99,21 @@ class LodgeImageAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height: 50px; max-width: 50px;" />', obj.image.url)
         return '-'
     image_preview.short_description = 'Превью'
+
+
+@admin.register(LodgePrice)
+class LodgePriceAdmin(admin.ModelAdmin):
+    """Админка для цен размещения"""
+    list_display = ['lodge', 'name', 'cost', 'is_active', 'order']
+    list_filter = ['is_active', 'lodge']
+    search_fields = ['lodge__name', 'name']
+    ordering = ['lodge', 'order']
+
+
+@admin.register(LodgeAvailability)
+class LodgeAvailabilityAdmin(admin.ModelAdmin):
+    """Админка для доступности размещения"""
+    list_display = ['lodge', 'name', 'order']
+    list_filter = ['lodge']
+    search_fields = ['lodge__name', 'name']
+    ordering = ['lodge', 'order']
