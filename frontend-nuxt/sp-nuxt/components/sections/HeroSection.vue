@@ -166,17 +166,25 @@ const saveHero = async () => {
 const parallaxStyle = computed(() => {
   if (!parallaxEnabled.value) {
     return {
-      transform: "translateY(0px) scale(1.05)",
+      transform: "translate3d(0, 0, 0) scale(1.05)",
     };
   }
+  const y = scrollY.value * 0.5;
   return {
-    transform: `translateY(${scrollY.value * 0.5}px) scale(1.1)`,
+    transform: `translate3d(0, ${y}px, 0) scale(1.1)`,
+    willChange: "transform",
   };
 });
 
+/** Один апдейт на кадр: без rAF каждый scroll + Vue-реактивность дают фризы на тяжёлой странице */
+let parallaxRafId = null;
 const handleScroll = () => {
   if (!parallaxEnabled.value) return;
-  scrollY.value = window.scrollY;
+  if (parallaxRafId != null) return;
+  parallaxRafId = requestAnimationFrame(() => {
+    parallaxRafId = null;
+    scrollY.value = window.scrollY;
+  });
 };
 
 const closeMobileMenu = () => {
@@ -215,6 +223,10 @@ onBeforeUnmount(() => {
   if (import.meta.client) {
     document.body.style.overflow = "";
     window.removeEventListener("keydown", handleWindowKeydown);
+    if (parallaxRafId != null) {
+      cancelAnimationFrame(parallaxRafId);
+      parallaxRafId = null;
+    }
   }
   releaseHeroPreviewUrl(localHeroPreviewUrl.value);
   if (parallaxEnabled.value && import.meta.client) {
@@ -233,7 +245,7 @@ onBeforeUnmount(() => {
         v-if="localHeroPreviewUrl"
         :src="heroImageSrc"
         alt="Коттеджи базы отдыха Строгановские Просторы зимой"
-        class="h-full w-full object-cover transition-transform duration-200 ease-out"
+        class="h-full w-full object-cover [backface-visibility:hidden]"
         :style="parallaxStyle"
       />
       <NuxtImg
@@ -243,7 +255,7 @@ onBeforeUnmount(() => {
         :width="1410"
         :height="940"
         :quality="80"
-        class="h-full w-full object-cover transition-transform duration-200 ease-out"
+        class="h-full w-full object-cover [backface-visibility:hidden]"
         :style="parallaxStyle"
         loading="eager"
         decoding="async"
