@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useHead } from "#imports";
-import { Phone } from "lucide-vue-next";
+import { Menu, Phone, X } from "lucide-vue-next";
 import logo from "~/assets/resort/logo.webp";
 import nac from "~/assets/resort/nac.webp";
 
@@ -85,6 +85,7 @@ const editableHeroFileName = ref("");
 const isSaving = ref(false);
 const saveError = ref("");
 const saveSuccess = ref("");
+const mobileMenuOpen = ref(false);
 
 watch(
   heroData,
@@ -178,6 +179,21 @@ const handleScroll = () => {
   scrollY.value = window.scrollY;
 };
 
+const closeMobileMenu = () => {
+  mobileMenuOpen.value = false;
+};
+
+const handleWindowKeydown = (event) => {
+  if (event.key === "Escape") {
+    closeMobileMenu();
+  }
+};
+
+watch(mobileMenuOpen, (isOpen) => {
+  if (!import.meta.client) return;
+  document.body.style.overflow = isOpen ? "hidden" : "";
+});
+
 onMounted(() => {
   if (!import.meta.client) return;
 
@@ -191,9 +207,15 @@ onMounted(() => {
   if (parallaxEnabled.value) {
     window.addEventListener("scroll", handleScroll, { passive: true });
   }
+  window.addEventListener("keydown", handleWindowKeydown);
 });
 
 onBeforeUnmount(() => {
+  closeMobileMenu();
+  if (import.meta.client) {
+    document.body.style.overflow = "";
+    window.removeEventListener("keydown", handleWindowKeydown);
+  }
   releaseHeroPreviewUrl(localHeroPreviewUrl.value);
   if (parallaxEnabled.value && import.meta.client) {
     window.removeEventListener("scroll", handleScroll);
@@ -236,57 +258,59 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <nav class="animate-fade-in absolute left-0 right-0 top-0 z-20 p-6 md:p-8">
+    <nav class="animate-fade-in absolute left-0 right-0 top-0 z-20 p-4 md:p-8">
       <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-8">
+        <div class="flex items-center gap-4 md:gap-8">
           <div class="flex items-center">
             <NuxtImg
               :src="logo"
               alt="Строгановские Просторы"
-              class="h-12 transition-transform duration-300 hover:scale-105 md:h-16"
+              class="h-10 transition-transform duration-300 hover:scale-105 md:h-16"
               fetchpriority="high"
               decoding="async"
               sizes="140px"
               :preload="true"
             />
-            <div class="h-24 w-px bg-white mx-[0.8rem]"></div>
+            <div class="mx-[0.6rem] h-16 w-px bg-white md:mx-[0.8rem] md:h-24"></div>
             <NuxtImg
               :src="nac"
               fetchpriority="high"
               alt="национальные проекты"
-              class="h-24"
+              class="h-16 md:h-24"
               decoding="async"
               sizes="150px"
               :preload="true"
             />
           </div>
-          <a
-            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
-            href="#lodge"
-            >о клубе</a
-          >
-          <a
-            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
-            href="/lodge"
-            >дома</a
-          >
-          <a
-            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
-            href="#active"
-            >услуги</a
-          >
-          <a
-            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
-            href="/event-calculator"
-            >мероприятия</a
-          >
-          <a
-            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
-            href="#contacts"
-            >как добраться</a
-          >
+          <div class="hidden items-center gap-8 md:flex">
+            <a
+              class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+              href="#lodge"
+              >о клубе</a
+            >
+            <a
+              class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+              href="/lodge"
+              >дома</a
+            >
+            <a
+              class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+              href="#active"
+              >услуги</a
+            >
+            <a
+              class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+              href="/event-calculator"
+              >мероприятия</a
+            >
+            <a
+              class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+              href="#contacts"
+              >как добраться</a
+            >
+          </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="hidden items-center gap-4 md:flex">
           <a
             href="tel:+79991234567"
             class="transition-transform duration-300 text-primary-foreground hover:scale-110 hover:text-primary-foreground/80"
@@ -298,6 +322,62 @@ onBeforeUnmount(() => {
           >
             забронировать
           </button>
+        </div>
+        <div class="flex items-center gap-2 md:hidden">
+          <button
+            class="flex h-10 w-10 items-center justify-center rounded-full border border-primary-foreground/70 bg-black/20 text-primary-foreground backdrop-blur-sm transition-colors hover:bg-primary-foreground/15"
+            :aria-label="mobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'"
+            :aria-expanded="mobileMenuOpen"
+            @click="mobileMenuOpen = !mobileMenuOpen"
+          >
+            <X v-if="mobileMenuOpen" class="h-5 w-5" />
+            <Menu v-else class="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+      <div
+        v-if="mobileMenuOpen"
+        class="mt-3 ml-auto w-full max-w-[360px] rounded-2xl border border-white/20 bg-primary/85 p-4 shadow-xl backdrop-blur-md md:hidden"
+      >
+        <div class="flex flex-col gap-3 text-primary-foreground">
+          <a
+            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+            href="#lodge"
+            @click="closeMobileMenu"
+            >о клубе</a
+          >
+          <a
+            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+            href="/lodge"
+            @click="closeMobileMenu"
+            >дома</a
+          >
+          <a
+            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+            href="#active"
+            @click="closeMobileMenu"
+            >услуги</a
+          >
+          <a
+            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+            href="/event-calculator"
+            @click="closeMobileMenu"
+            >мероприятия</a
+          >
+          <a
+            class="transition-all duration-300 text-primary-foreground hover:translate-y-[-2px] hover:text-primary-foreground/80"
+            href="#contacts"
+            @click="closeMobileMenu"
+            >как добраться</a
+          >
+          <a
+            href="tel:+79991234567"
+            class="mt-2 inline-flex w-fit items-center gap-2 transition-transform duration-300 text-primary-foreground hover:scale-105 hover:text-primary-foreground/80"
+            @click="closeMobileMenu"
+          >
+            <Phone class="w-5 h-5" />
+            <span>+7 (999) 123-45-67</span>
+          </a>
         </div>
       </div>
     </nav>
@@ -386,6 +466,13 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
+        </div>
+        <div class="mt-6 flex justify-center md:hidden">
+          <button
+            class="rounded-full border border-primary-foreground bg-primary-foreground/10 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-primary-foreground backdrop-blur-sm transition-all duration-300 hover:bg-primary-foreground hover:text-primary"
+          >
+            забронировать
+          </button>
         </div>
       </div>
     </div>

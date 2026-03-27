@@ -32,6 +32,20 @@ export const useAdminContentApi = () => {
     })
   }
 
+  const patchForm = async (endpoint, formData) => {
+    await ensureCsrf()
+    const csrfToken = getCookieValue("csrftoken")
+
+    return await $fetch(`${apiBase}${endpoint}`, {
+      method: "PATCH",
+      body: formData,
+      credentials: "include",
+      headers: {
+        ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
+      },
+    })
+  }
+
   const get = async (endpoint) => {
     await ensureCsrf()
     return await $fetch(`${apiBase}${endpoint}`, {
@@ -69,5 +83,5 @@ export const useAdminContentApi = () => {
     })
   }
 
-  return { get, patch, post, postForm }
+  return { get, patch, patchForm, post, postForm }
 }
